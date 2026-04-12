@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAU Boutique — Moda &amp; Estilo</title>
+  <meta name="description" content="PAU Boutique — Colecciones exclusivas de moda femenina. Elegancia, estilo y sofisticación en cada prenda.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    <p>ENVÍO GRATIS EN COMPRAS MAYORES A S/. 200 &nbsp;&bull;&nbsp; NUEVA COLECCIÓN OTOÑO 2026</p>
+  </div>
+
+  <!-- Header -->
+  <header class="header" id="header">
+    <div class="header__container">
+      <nav class="header__nav header__nav--left">
+        <a href="#colecciones" class="nav-link">Colecciones</a>
+        <a href="#productos" class="nav-link">Productos</a>
+        <a href="#nosotros" class="nav-link">Nosotros</a>
+      </nav>
+
+      <a href="#" class="header__logo">
+        <span class="logo-text">PAU</span>
+        <span class="logo-sub">BOUTIQUE</span>
+      </a>
+
+      <div class="header__nav header__nav--right">
+        <a href="#" class="nav-link">Cuenta</a>
+        <a href="#" class="nav-link nav-link--icon" id="search-toggle" aria-label="Buscar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </a>
+        <a href="#" class="nav-link nav-link--icon" aria-label="Carrito">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <span class="cart-count">0</span>
+        </a>
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="header__menu-toggle" id="menu-toggle" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav" id="mobile-nav">
+      <a href="#colecciones" class="mobile-nav__link">Colecciones</a>
+      <a href="#productos" class="mobile-nav__link">Productos</a>
+      <a href="#nosotros" class="mobile-nav__link">Nosotros</a>
+      <a href="#" class="mobile-nav__link">Cuenta</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero__media">
+      <img src="" alt="Moda Otoño 2026" class="hero__image" id="hero-img">
+    </div>
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <p class="hero__subtitle" data-animate>Colección Otoño / Invierno</p>
+      <h1 class="hero__title" data-animate>Elegancia<br>Redefinida</h1>
+      <a href="#productos" class="btn btn--primary hero__btn" data-animate>Explorar Colección</a>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="categories" id="colecciones">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-header__line"></span>
+        <h2 class="section-header__title">Colecciones</h2>
+        <span class="section-header__line"></span>
+      </div>
+
+      <div class="categories__grid">
+        <a href="#" class="category-card" data-animate>
+          <div class="category-card__image-wrap">
+            <img src="" alt="Vestidos" class="category-card__image" id="cat-img-1">
+          </div>
+          <div class="category-card__info">
+            <h3 class="category-card__title">Vestidos</h3>
+            <span class="category-card__link">Ver colección &rarr;</span>
+          </div>
+        </a>
+
+        <a href="#" class="category-card" data-animate>
+          <div class="category-card__image-wrap">
+            <img src="" alt="Abrigos" class="category-card__image" id="cat-img-2">
+          </div>
+          <div class="category-card__info">
+            <h3 class="category-card__title">Abrigos &amp; Blazers</h3>
+            <span class="category-card__link">Ver colección &rarr;</span>
+          </div>
+        </a>
+
+        <a href="#" class="category-card" data-animate>
+          <div class="category-card__image-wrap">
+            <img src="" alt="Accesorios" class="category-card__image" id="cat-img-3">
+          </div>
+          <div class="category-card__info">
+            <h3 class="category-card__title">Accesorios</h3>
+            <span class="category-card__link">Ver colección &rarr;</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Banner -->
+  <section class="featured-banner">
+    <div class="featured-banner__media">
+      <img src="" alt="Nueva Temporada" class="featured-banner__image" id="banner-img">
+    </div>
+    <div class="featured-banner__overlay"></div>
+    <div class="featured-banner__content" data-animate>
+      <p class="featured-banner__subtitle">Exclusivo</p>
+      <h2 class="featured-banner__title">Nueva Temporada</h2>
+      <p class="featured-banner__desc">Descubre las piezas que definirán tu estilo esta temporada. Tejidos premium, cortes impecables.</p>
+      <a href="#productos" class="btn btn--outline-light">Descubrir</a>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="products" id="productos">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-header__line"></span>
+        <h2 class="section-header__title">Destacados</h2>
+        <span class="section-header__line"></span>
+      </div>
+
+      <div class="products__filters">
+        <button class="filter-btn active" data-filter="all">Todos</button>
+        <button class="filter-btn" data-filter="vestidos">Vestidos</button>
+        <button class="filter-btn" data-filter="abrigos">Abrigos</button>
+        <button class="filter-btn" data-filter="accesorios">Accesorios</button>
+      </div>
+
+      <div class="products__grid" id="products-grid">
+        <!-- Products injected by JS -->
+      </div>
+
+      <div class="products__cta">
+        <a href="#" class="btn btn--primary">Ver Todos los Productos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About / Story -->
+  <section class="about" id="nosotros">
+    <div class="container">
+      <div class="about__grid">
+        <div class="about__image-wrap" data-animate>
+          <img src="" alt="Nuestra historia" class="about__image" id="about-img">
+        </div>
+        <div class="about__content" data-animate>
+          <span class="about__label">Nuestra Historia</span>
+          <h2 class="about__title">Prendas que Cuentan Historias</h2>
+          <p class="about__text">En PAU Boutique creemos que la moda es una forma de expresión personal. Cada pieza de nuestra colección ha sido cuidadosamente seleccionada para mujeres que valoran la calidad, el diseño atemporal y la elegancia natural.</p>
+          <p class="about__text">Desde 2018, hemos vestido a mujeres que buscan algo más que ropa: buscan confianza, estilo y sofisticación.</p>
+          <a href="#" class="btn btn--primary">Conocer Más</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-header__line"></span>
+        <h2 class="section-header__title">Lo Que Dicen</h2>
+        <span class="section-header__line"></span>
+      </div>
+
+      <div class="testimonials__carousel" id="testimonials-carousel">
+        <div class="testimonial active">
+          <p class="testimonial__quote">"La calidad de cada prenda es excepcional. PAU Boutique es mi tienda favorita para encontrar piezas únicas que no encuentro en ningún otro lugar."</p>
+          <span class="testimonial__author">— María Fernanda R.</span>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial__quote">"Cada vez que necesito un look especial, confío en PAU. La atención personalizada y las colecciones son simplemente perfectas."</p>
+          <span class="testimonial__author">— Carolina S.</span>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial__quote">"Elegancia en cada detalle. Las telas, los cortes, los acabados... todo habla de un compromiso real con la moda de calidad."</p>
+          <span class="testimonial__author">— Valentina M.</span>
+        </div>
+      </div>
+      <div class="testimonials__dots" id="testimonial-dots"></div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="newsletter">
+    <div class="container">
+      <div class="newsletter__content" data-animate>
+        <h2 class="newsletter__title">Únete al Mundo PAU</h2>
+        <p class="newsletter__desc">Suscríbete y recibe acceso anticipado a nuevas colecciones, ofertas exclusivas y consejos de estilo.</p>
+        <form class="newsletter__form" id="newsletter-form">
+          <input type="email" placeholder="Tu correo electrónico" class="newsletter__input" required>
+          <button type="submit" class="btn btn--primary">Suscribirse</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Instagram Feed -->
+  <section class="instagram">
+    <div class="section-header" style="padding: 0 var(--space-lg); margin-bottom: var(--space-md);">
+      <span class="section-header__line"></span>
+      <h2 class="section-header__title">@pau.boutique</h2>
+      <span class="section-header__line"></span>
+    </div>
+    <div class="instagram__grid" id="instagram-grid">
+      <a href="#" class="instagram__item"><img src="" alt="Instagram 1" id="insta-img-1"></a>
+      <a href="#" class="instagram__item"><img src="" alt="Instagram 2" id="insta-img-2"></a>
+      <a href="#" class="instagram__item"><img src="" alt="Instagram 3" id="insta-img-3"></a>
+      <a href="#" class="instagram__item"><img src="" alt="Instagram 4" id="insta-img-4"></a>
+      <a href="#" class="instagram__item"><img src="" alt="Instagram 5" id="insta-img-5"></a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__col">
+          <div class="footer__logo">
+            <span class="logo-text">PAU</span>
+            <span class="logo-sub">BOUTIQUE</span>
+          </div>
+          <p class="footer__about">Elegancia y sofisticación en cada prenda. Tu destino de moda exclusiva.</p>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__heading">Tienda</h4>
+          <a href="#" class="footer__link">Nuevos Ingresos</a>
+          <a href="#" class="footer__link">Vestidos</a>
+          <a href="#" class="footer__link">Abrigos</a>
+          <a href="#" class="footer__link">Accesorios</a>
+          <a href="#" class="footer__link">Sale</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__heading">Información</h4>
+          <a href="#" class="footer__link">Sobre Nosotros</a>
+          <a href="#" class="footer__link">Política de Envíos</a>
+          <a href="#" class="footer__link">Devoluciones</a>
+          <a href="#" class="footer__link">Preguntas Frecuentes</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__heading">Contacto</h4>
+          <a href="#" class="footer__link">contacto@pauboutique.com</a>
+          <a href="#" class="footer__link">+51 987 654 321</a>
+          <div class="footer__social">
+            <a href="#" aria-label="Instagram" class="footer__social-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="#" aria-label="Facebook" class="footer__social-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </a>
+            <a href="#" aria-label="TikTok" class="footer__social-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; 2026 PAU Boutique. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
