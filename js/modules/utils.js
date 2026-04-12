@@ -6,14 +6,17 @@ export function getUnsplashUrl(query, w = 600, h = 800) {
 export function loadStaticImages() {
   const imageMap = {
     'hero-img': { 
-      local: 'images/banners/Banner.png',
       query: 'fashion model elegant boutique runway', 
       w: 1600, h: 900 
     },
     'cat-img-1': { query: 'woman wearing elegant dress fashion', w: 600, h: 800 },
     'cat-img-2': { query: 'woman blazer coat fashion editorial neutral', w: 600, h: 800 },
     'cat-img-3': { query: 'fashion accessories jewelry handbag minimal', w: 600, h: 800 },
-    'banner-img': { query: 'fashion editorial dark moody elegant', w: 1600, h: 900 },
+    'banner-img': { 
+      local: 'images/banners/Banner.png',
+      query: 'fashion editorial dark moody elegant', 
+      w: 1600, h: 900 
+    },
     'about-img': { query: 'boutique clothing store interior elegant', w: 800, h: 1000 },
     'insta-img-1': { query: 'fashion outfit street style woman', w: 600, h: 600 },
     'insta-img-2': { query: 'minimalist fashion flatlay', w: 600, h: 600 },
