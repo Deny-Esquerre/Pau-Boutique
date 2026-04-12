@@ -6,6 +6,7 @@ export function getUnsplashUrl(query, w = 600, h = 800) {
 export function loadStaticImages() {
   const imageMap = {
     'hero-img': { 
+      local: 'images/banners/Banner.png',
       query: 'fashion model elegant boutique runway', 
       w: 1600, h: 900 
     },
@@ -13,7 +14,6 @@ export function loadStaticImages() {
     'cat-img-2': { query: 'woman blazer coat fashion editorial neutral', w: 600, h: 800 },
     'cat-img-3': { query: 'fashion accessories jewelry handbag minimal', w: 600, h: 800 },
     'banner-img': { 
-      local: 'images/banners/Banner.png',
       query: 'fashion editorial dark moody elegant', 
       w: 1600, h: 900 
     },
