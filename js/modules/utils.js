@@ -5,7 +5,11 @@ export function getUnsplashUrl(query, w = 600, h = 800) {
 
 export function loadStaticImages() {
   const imageMap = {
-    'hero-img': { query: 'fashion model elegant boutique runway', w: 1600, h: 900 },
+    'hero-img': { 
+      local: 'assets/img/banners/banner.png',
+      query: 'fashion model elegant boutique runway', 
+      w: 1600, h: 900 
+    },
     'cat-img-1': { query: 'woman wearing elegant dress fashion', w: 600, h: 800 },
     'cat-img-2': { query: 'woman blazer coat fashion editorial neutral', w: 600, h: 800 },
     'cat-img-3': { query: 'fashion accessories jewelry handbag minimal', w: 600, h: 800 },
@@ -18,11 +22,20 @@ export function loadStaticImages() {
     'insta-img-5': { query: 'luxury fashion accessories', w: 600, h: 600 },
   };
 
-  Object.entries(imageMap).forEach(([id, { query, w, h }]) => {
+  Object.entries(imageMap).forEach(([id, { query, w, h, local }]) => {
     const el = document.getElementById(id);
     if (el) {
-      el.src = getUnsplashUrl(query, w, h);
+      // Priorizar imagen local si está definida, de lo contrario usar Unsplash
+      el.src = local ? local : getUnsplashUrl(query, w, h);
       el.loading = 'lazy';
+      
+      // Manejar error de carga si la imagen local no existe
+      if (local) {
+        el.onerror = () => {
+          el.src = getUnsplashUrl(query, w, h);
+          el.onerror = null;
+        };
+      }
     }
   });
 }
