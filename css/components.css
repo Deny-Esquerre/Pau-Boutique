@@ -224,13 +224,13 @@
 
 /* --- Logo Images --- */
 .header__logo-img {
-  height: 50px;
+  height: 80px;
   width: auto;
   transition: transform var(--transition-base);
 }
 
 .footer__logo-img {
-  height: 60px;
+  height: 110px;
   width: auto;
   filter: brightness(0) invert(1); /* Logo blanco para el footer */
 }
