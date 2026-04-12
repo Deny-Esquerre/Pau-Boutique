@@ -232,7 +232,6 @@
 .footer__logo-img {
   height: 110px;
   width: auto;
-  filter: brightness(0) invert(1); /* Logo blanco para el footer */
 }
 
 /* --- Overlays --- */
