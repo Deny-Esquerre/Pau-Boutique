@@ -6,7 +6,7 @@ export function getUnsplashUrl(query, w = 600, h = 800) {
 export function loadStaticImages() {
   const imageMap = {
     'hero-img': { 
-      local: 'assets/img/banners/banner.png',
+      local: 'images/banners/Banner.png',
       query: 'fashion model elegant boutique runway', 
       w: 1600, h: 900 
     },
