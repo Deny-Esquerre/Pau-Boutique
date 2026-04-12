@@ -1,0 +1,35 @@
+/* --- Design Tokens --- */
+:root {
+  /* Colors */
+  --color-black: #1a1a1a;
+  --color-dark: #2c2c2c;
+  --color-charcoal: #3d3d3d;
+  --color-gray: #8a8a8a;
+  --color-gray-light: #c5c5c5;
+  --color-cream: #f5f0eb;
+  --color-beige: #ede5da;
+  --color-warm-white: #faf8f5;
+  --color-white: #ffffff;
+  --color-accent: #3e2f23;
+
+  /* Typography */
+  --font-serif: 'Cormorant Garamond', 'Georgia', serif;
+  --font-sans: 'Jost', 'Helvetica Neue', sans-serif;
+
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 4rem;
+  --space-xl: 6rem;
+  --space-2xl: 8rem;
+
+  /* Transitions */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Misc */
+  --max-width: 1280px;
+  --header-height: 70px;
+}

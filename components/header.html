@@ -1,0 +1,42 @@
+<!-- Header Component -->
+<header class="header" id="header">
+  <div class="header__container">
+    <nav class="header__nav header__nav--left">
+      <a href="#colecciones" class="nav-link">Colecciones</a>
+      <a href="#productos" class="nav-link">Productos</a>
+      <a href="#nosotros" class="nav-link">Nosotros</a>
+    </nav>
+
+    <a href="#" class="header__logo">
+      <img src="logo.png" alt="PAU Boutique" class="header__logo-img">
+    </a>
+
+    <div class="header__nav header__nav--right">
+      <a href="#" class="nav-link">Cuenta</a>
+      <a href="#" class="nav-link nav-link--icon" id="search-toggle" aria-label="Buscar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </a>
+      <a href="#" class="nav-link nav-link--icon" aria-label="Carrito">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span class="cart-count">0</span>
+      </a>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="header__menu-toggle" id="menu-toggle" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- Mobile Nav -->
+  <nav class="mobile-nav" id="mobile-nav">
+    <a href="#colecciones" class="mobile-nav__link">Colecciones</a>
+    <a href="#productos" class="mobile-nav__link">Productos</a>
+    <a href="#nosotros" class="mobile-nav__link">Nosotros</a>
+    <a href="#" class="mobile-nav__link">Cuenta</a>
+  </nav>
+</header>

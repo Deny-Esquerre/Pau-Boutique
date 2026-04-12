@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
@@ -27,8 +27,7 @@
       </nav>
 
       <a href="#" class="header__logo">
-        <span class="logo-text">PAU</span>
-        <span class="logo-sub">BOUTIQUE</span>
+        <img src="logo.png" alt="PAU Boutique" class="header__logo-img">
       </a>
 
       <div class="header__nav header__nav--right">
@@ -238,8 +237,7 @@
       <div class="footer__grid">
         <div class="footer__col">
           <div class="footer__logo">
-            <span class="logo-text">PAU</span>
-            <span class="logo-sub">BOUTIQUE</span>
+            <img src="logo.png" alt="PAU Boutique" class="footer__logo-img">
           </div>
           <p class="footer__about">Elegancia y sofisticación en cada prenda. Tu destino de moda exclusiva.</p>
         </div>
@@ -281,6 +279,36 @@
     </div>
   </footer>
 
-  <script src="app.js"></script>
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Cart Drawer -->
+  <div class="drawer" id="cart-drawer">
+    <div class="drawer__header">
+      <h3 class="drawer__title">Tu Carrito</h3>
+      <button class="drawer__close" id="cart-close">&times;</button>
+    </div>
+    <div class="drawer__content" id="cart-items">
+      <!-- Items injected by JS -->
+      <p style="text-align: center; color: var(--color-gray); margin-top: 2rem;">Tu carrito está vacío</p>
+    </div>
+    <div class="drawer__footer">
+      <div class="drawer__total">
+        <span>Total</span>
+        <span id="cart-total">S/. 0.00</span>
+      </div>
+      <button class="btn btn--primary" style="width: 100%;">Finalizar Compra</button>
+    </div>
+  </div>
+
+  <!-- Product Quick View Modal -->
+  <div class="modal" id="product-modal">
+    <button class="modal__close" id="modal-close">&times;</button>
+    <div id="modal-content">
+      <!-- Content injected by JS -->
+    </div>
+  </div>
+
+  <script src="js/main.js" type="module"></script>
 </body>
 </html>
