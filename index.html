@@ -31,7 +31,7 @@
       </a>
 
       <div class="header__nav header__nav--right">
-        <a href="#" class="nav-link">Cuenta</a>
+        <a href="#" class="nav-link open-login">Cuenta</a>
         <a href="#" class="nav-link nav-link--icon" id="search-toggle" aria-label="Buscar">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -56,7 +56,7 @@
       <a href="#colecciones" class="mobile-nav__link">Colecciones</a>
       <a href="#productos" class="mobile-nav__link">Productos</a>
       <a href="#nosotros" class="mobile-nav__link">Nosotros</a>
-      <a href="#" class="mobile-nav__link">Cuenta</a>
+      <a href="#" class="mobile-nav__link open-login">Cuenta</a>
     </nav>
   </header>
 
@@ -301,11 +301,25 @@
     </div>
   </div>
 
-  <!-- Product Quick View Modal -->
-  <div class="modal" id="product-modal">
-    <button class="modal__close" id="modal-close">&times;</button>
-    <div id="modal-content">
-      <!-- Content injected by JS -->
+  <!-- Login Modal -->
+  <div class="modal" id="login-modal">
+    <button class="modal__close" id="login-close">&times;</button>
+    <div class="modal__container" style="max-width: 400px; padding: var(--space-md);">
+      <div class="modal__info" style="width: 100%; padding: 0;">
+        <h2 class="modal__title" style="text-align: center; margin-bottom: 2rem;">Acceso Administrativo</h2>
+        <form id="admin-login-form">
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Email</label>
+            <input type="email" id="admin-email" class="form-control" required style="width: 100%; border: 1px solid #ddd; padding: 12px; font-family: var(--font-sans);">
+          </div>
+          <div class="form-group" style="margin-bottom: 2rem;">
+            <label style="display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Contraseña</label>
+            <input type="password" id="admin-password" class="form-control" required style="width: 100%; border: 1px solid #ddd; padding: 12px; font-family: var(--font-sans);">
+          </div>
+          <button type="submit" class="btn btn--primary" style="width: 100%;">Ingresar al Panel</button>
+        </form>
+        <p id="login-error" style="color: #d9534f; font-size: 0.8rem; margin-top: 1rem; text-align: center; display: none;"></p>
+      </div>
     </div>
   </div>
 

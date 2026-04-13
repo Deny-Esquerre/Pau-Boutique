@@ -28,6 +28,8 @@ const logoutBtn = document.getElementById('logout-btn');
 const sidebarLinks = document.querySelectorAll('.sidebar__link');
 const modules = document.querySelectorAll('.module-section');
 const loadingOverlay = document.getElementById('loading-overlay');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const sidebar = document.querySelector('.sidebar');
 
 // DOM Elements - Form & List
 const productForm = document.getElementById('product-form');
@@ -76,6 +78,11 @@ logoutBtn.addEventListener('click', () => signOut(auth));
 function switchModule(moduleId) {
   modules.forEach(mod => mod.id === `mod-${moduleId}` ? mod.classList.add('active') : mod.classList.remove('active'));
   sidebarLinks.forEach(link => link.dataset.mod === moduleId ? link.classList.add('active') : link.classList.remove('active'));
+  
+  // Close sidebar on mobile after selection
+  if (window.innerWidth <= 992) {
+    sidebar.classList.remove('active');
+  }
 }
 
 sidebarLinks.forEach(link => {
@@ -84,6 +91,12 @@ sidebarLinks.forEach(link => {
     switchModule(link.dataset.mod);
   });
 });
+
+if (sidebarToggle) {
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+  });
+}
 
 quickLinks.forEach(btn => {
   btn.addEventListener('click', () => switchModule(btn.dataset.mod));
