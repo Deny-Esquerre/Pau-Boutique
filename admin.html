@@ -612,19 +612,22 @@
             </div>
 
             <!-- Modal / Sub-form for Categories (Initially Hidden) -->
-            <div id="cat-manager-panel" style="display: none; margin-top: 1.5rem; padding: 1.5rem; border: 1px solid var(--admin-accent); background: var(--color-cream); border-radius: 4px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h4 style="margin: 0; font-family: var(--font-serif); font-size: 1.1rem; color: var(--color-black);">Gestionar Mis Categorías</h4>
-                <button type="button" id="close-cat-manager" style="background: none; border: none; cursor: pointer; font-size: 1.5rem;">&times;</button>
+            <div id="cat-manager-panel" style="display: none; margin-top: 1.5rem; padding: 1.5rem; border: 1px solid var(--admin-accent); background: var(--color-warm-white); border-radius: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                <h4 style="margin: 0; font-family: var(--font-serif); font-size: 1.2rem; color: var(--color-black);">Gestionar Categorías</h4>
+                <button type="button" id="close-cat-manager" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--color-gray);">&times;</button>
               </div>
               
-              <div id="cat-list-admin" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1.5rem;">
-                <!-- Chips de categorías con botón X -->
+              <div id="cat-list-admin" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; min-height: 40px;">
+                <!-- Chips de categorías -->
               </div>
 
-              <div style="display: flex; gap: 10px;">
-                <input type="text" id="new-cat-name" placeholder="Nueva categoría..." style="flex: 1; border: 1px solid #ddd; padding: 8px 12px; font-family: var(--font-sans); border-radius: 2px;">
-                <button type="button" id="save-new-cat" class="btn btn--primary" style="padding: 8px 20px; font-size: 0.8rem;">Añadir</button>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <label style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-gray);">Nueva Categoría</label>
+                <div style="display: flex; gap: 10px;">
+                  <input type="text" id="new-cat-name" placeholder="Ej: Joyería" style="flex: 1; border: 1px solid #ddd; padding: 10px; font-family: var(--font-sans); border-radius: 0; background: white; min-width: 0;">
+                  <button type="button" id="save-new-cat" class="btn btn--primary" style="padding: 10px 25px; font-size: 0.75rem; white-space: nowrap; flex-shrink: 0;">Añadir</button>
+                </div>
               </div>
             </div>
 
