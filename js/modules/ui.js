@@ -2,6 +2,7 @@ import { db } from '../firebase-config.js';
 import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 /* --- UI Effects --- */
+
 export function initHeaderScroll() {
   const header = document.getElementById('header');
   window.addEventListener('scroll', () => {
@@ -32,7 +33,7 @@ export async function initTestimonials() {
     const querySnapshot = await getDocs(q);
     
     if (querySnapshot.empty) {
-      container.innerHTML = '<p style="text-align: center; color: var(--color-gray); font-style: italic;">Próximamente más experiencias...</p>';
+      container.innerHTML = '<p style="text-align: center; color: var(--color-gray); font-family: var(--font-serif); font-style: italic; padding: 2rem;">Próximamente más experiencias...</p>';
       return;
     }
 
