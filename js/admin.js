@@ -59,6 +59,12 @@ const uploadStatus = document.getElementById('upload-status');
 const imagePreview = document.getElementById('image-preview');
 let uploadedImages = []; // Array to store multiple URLs
 
+// DOM Elements - Notifications
+const notificationForm = document.getElementById('notification-form');
+const notifHistoryList = document.getElementById('notifications-history-list');
+const statSubscribers = document.getElementById('stat-subscribers');
+const statTotalNotifications = document.getElementById('stat-total-notifications');
+
 /* --- Categories Management Logic --- */
 
 async function loadCategories() {
@@ -142,6 +148,14 @@ if (saveCatBtn) {
       await addDoc(collection(db, "categories"), { name: name });
       newCatInput.value = '';
       showToast("¡Categoría añadida!");
+      
+      // Automatic Notification
+      sendGlobalNotification(
+        "Nueva Colección",
+        `¡Pau Boutique ha añadido la colección "${name}"! Ven a ver lo nuevo.`,
+        "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80"
+      );
+      
       loadCategories();
     } catch (error) {
       showToast("Error: " + error.message, "error");
@@ -199,6 +213,9 @@ function switchModule(moduleId) {
   
   if (moduleId === 'config') {
     initConfigModule();
+  }
+  if (moduleId === 'notifications') {
+    initNotificationsModule();
   }
 
   // Close sidebar on mobile after selection
@@ -697,5 +714,109 @@ if (migrateBtn) {
         toggleLoading(false);
       }
     }
+  });
+}
+/* --- Notifications Logic --- */
+
+async function initNotificationsModule() {
+  loadSubscribersCount();
+  loadNotificationsHistory();
+}
+
+async function loadSubscribersCount() {
+  if (!statSubscribers) return;
+  try {
+    const querySnapshot = await getDocs(collection(db, "fcm_tokens"));
+    statSubscribers.textContent = querySnapshot.size;
+  } catch (error) {
+    console.error("Error al contar suscriptores:", error);
+  }
+}
+
+async function loadNotificationsHistory() {
+  if (!notifHistoryList) return;
+  try {
+    const q = query(collection(db, "notifications_history"), orderBy("sentAt", "desc"));
+    const querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty) {
+      notifHistoryList.innerHTML = '<p style="text-align: center; color: #999; padding: 1rem;">No hay mensajes enviados recientemente.</p>';
+      return;
+    }
+
+    notifHistoryList.innerHTML = '';
+    statTotalNotifications.textContent = querySnapshot.size;
+
+    querySnapshot.forEach(docSnap => {
+      const n = docSnap.data();
+      const div = document.createElement('div');
+      div.style.padding = "15px";
+      div.style.border = "1px solid #eee";
+      div.style.borderRadius = "4px";
+      div.style.display = "flex";
+      div.style.justifyContent = "space-between";
+      div.style.alignItems = "center";
+      
+      div.innerHTML = `
+        <div style="text-align: left;">
+          <p style="font-weight: 600; font-size: 0.9rem; margin: 0;">${n.title}</p>
+          <p style="font-size: 0.8rem; color: #666; margin: 5px 0 0;">${n.body}</p>
+          <span style="font-size: 0.65rem; color: #999;">${new Date(n.sentAt.toDate()).toLocaleString()}</span>
+        </div>
+        ${n.image ? `<img src="${n.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` : ''}
+      `;
+      notifHistoryList.appendChild(div);
+    });
+  } catch (error) {
+    console.error("Error al cargar historial:", error);
+  }
+}
+
+async function sendGlobalNotification(title, body, image = "") {
+  try {
+    // 1. Guardar en el historial
+    const notifData = {
+      title,
+      body,
+      image,
+      sentAt: new Date(),
+      status: 'pending' // En un sistema real, un backend enviaría esto
+    };
+    await addDoc(collection(db, "notifications_history"), notifData);
+    
+    // 2. Simulación de envío PUSH (En un entorno real aquí se llamaría a una Cloud Function)
+    // Para propósitos de demostración, mostramos un éxito.
+    console.log(`Push Notification Triggered: ${title} - ${body}`);
+    
+    // Si estamos en el módulo de notificaciones, recargar
+    loadNotificationsHistory();
+    
+    return true;
+  } catch (error) {
+    console.error("Error enviando notificación:", error);
+    return false;
+  }
+}
+
+if (notificationForm) {
+  notificationForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    toggleLoading(true);
+
+    const title = document.getElementById('notif-title').value.trim();
+    const body = document.getElementById('notif-body').value.trim();
+    const image = document.getElementById('notif-image').value.trim();
+
+    const success = await sendGlobalNotification(title, body, image);
+    
+    if (success) {
+      showToast("¡Notificación enviada a la cola de envío!");
+      notificationForm.reset();
+      loadSubscribersCount();
+    } else {
+      showToast("Error al enviar la notificación", "error");
+    }
+    
+    toggleLoading(false);
   });
 }

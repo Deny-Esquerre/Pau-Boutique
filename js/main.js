@@ -14,6 +14,7 @@ import {
 } from './modules/ui.js';
 import { openLoginModal, closeLoginModal, handleAdminLogin } from './modules/auth.js';
 import { applyConfig } from './modules/config.js';
+import { initNotifications } from './modules/notifications.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -26,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTestimonials();
   initSmoothScroll();
   initScrollAnimations();
+  initNotifications();
 
   // Global UI Listeners
   const overlay = document.getElementById('overlay');
