@@ -3,7 +3,7 @@
    =================================================== */
 
 import { loadStaticImages } from './modules/utils.js';
-import { renderProducts, closeModal } from './modules/products.js';
+import { renderProducts, renderCategoryFilters, closeModal } from './modules/products.js';
 import { closeCart, openCart } from './modules/cart.js';
 import { 
   initHeaderScroll, 
@@ -81,4 +81,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+});
 });

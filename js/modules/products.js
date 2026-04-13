@@ -5,7 +5,9 @@ import {
   onSnapshot, 
   query, 
   where, 
-  orderBy 
+  orderBy,
+  limit,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 import { getUnsplashUrl } from './utils.js';
 import { addToCart } from './cart.js';
@@ -14,20 +16,58 @@ import { addToCart } from './cart.js';
 let productsCache = [];
 let unsubscribeProducts = null;
 
+/**
+ * Dynamically renders the 5 most recent categories as filter buttons
+ */
+export async function renderCategoryFilters() {
+  const filtersContainer = document.getElementById('category-filters');
+  if (!filtersContainer) return;
+
+  try {
+    const catsRef = collection(db, "categories");
+    // Obtenemos las 5 categorías (puedes ajustar el orden si prefieres por fecha)
+    const q = query(catsRef, orderBy("name", "asc"), limit(5));
+    const querySnapshot = await getDocs(q);
+    
+    // Mantener siempre el botón "Todos"
+    filtersContainer.innerHTML = '<button class="filter-btn active" data-filter="all">Todos</button>';
+
+    querySnapshot.forEach((docSnap) => {
+      const cat = docSnap.data();
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.dataset.filter = cat.name.toLowerCase();
+      btn.textContent = cat.name;
+      
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderProducts(btn.dataset.filter);
+      });
+      
+      filtersContainer.appendChild(btn);
+    });
+
+  } catch (error) {
+    console.error("Error al cargar filtros de categoría:", error);
+  }
+}
+
 export function renderProducts(filter = 'all') {
   const grid = document.getElementById('products-grid');
   if (!grid) return;
 
-  grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;">Cargando colección...</div>';
+  grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; font-family: var(--font-serif); font-style: italic; color: var(--color-gray);">Descubriendo piezas exclusivas...</div>';
 
   try {
     let q;
     const productsRef = collection(db, "products");
     
+    // Si es una categoría específica, limitamos a 5 productos recientes según pides
     if (filter === 'all') {
-      q = query(productsRef, orderBy("createdAt", "desc"));
+      q = query(productsRef, orderBy("createdAt", "desc"), limit(12)); 
     } else {
-      q = query(productsRef, where("category", "==", filter), orderBy("createdAt", "desc"));
+      q = query(productsRef, where("category", "==", filter), orderBy("createdAt", "desc"), limit(5));
     }
 
     // Unsubscribe from previous listener if it exists
@@ -40,7 +80,12 @@ export function renderProducts(filter = 'all') {
       });
 
       if (productsCache.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;">No se encontraron productos en esta categoría.</div>';
+        grid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--color-gray);">
+            <p style="font-family: var(--font-serif); font-style: italic; font-size: 1.2rem; margin-bottom: 10px;">Lo sentimos</p>
+            <p style="font-family: var(--font-sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">No se encontraron productos en esta categoría.</p>
+          </div>
+        `;
         return;
       }
 
@@ -54,7 +99,7 @@ export function renderProducts(filter = 'all') {
           ? `<span class="product-card__badge">${product.badge}</span>`
           : '';
 
-        const rawImg = (product.images && product.images.length > 0) ? product.images[0] : (product.image || 'default-product');
+        const rawImg = (product.images && product.images.length > 0) ? product.images[0] : (product.image || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80');
         const imgSrc = rawImg.startsWith('http') ? rawImg : getUnsplashUrl(rawImg);
 
         return `
@@ -146,8 +191,9 @@ export function openProductModal(id) {
 export function closeModal() {
   const modal = document.getElementById('product-modal');
   const overlay = document.getElementById('overlay');
+  if (!modal) return;
   modal.classList.remove('active');
-  if (!document.getElementById('cart-drawer').classList.contains('active')) {
+  if (overlay && !document.getElementById('cart-drawer').classList.contains('active')) {
     overlay.classList.remove('active');
     document.body.classList.remove('no-scroll');
   }
