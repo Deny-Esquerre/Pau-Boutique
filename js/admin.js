@@ -33,13 +33,20 @@ const sidebarToggle = document.getElementById('sidebar-toggle');
 const sidebar = document.querySelector('.sidebar');
 const sidebarOverlay = document.getElementById('sidebar-overlay');
 const configForm = document.getElementById('config-form');
+
+// DOM Elements - Config Testimonials & Announcement
 const configAnnouncementInput = document.getElementById('config-announcement');
 const configAnnouncementPreview = document.getElementById('announcement-preview');
+const testimonialForm = document.getElementById('testimonial-form');
+const testimonialsListAdmin = document.getElementById('testimonials-admin-list');
+const migrateTBtn = document.getElementById('migrate-testimonials');
+const refreshTBtn = document.getElementById('refresh-testimonials');
 
-// DOM Elements - Form & List
+// DOM Elements - Form & List (Products)
 const productForm = document.getElementById('product-form');
 const inventoryList = document.getElementById('inventory-list');
 const imagesInput = document.getElementById('p-images-input');
+const dropzone = document.getElementById('dropzone');
 const uploadStatus = document.getElementById('upload-status');
 const imagePreview = document.getElementById('image-preview');
 let uploadedImages = []; // Array to store multiple URLs
@@ -161,110 +168,6 @@ async function initConfigModule() {
   loadTestimonialsAdmin();
 }
 
-async function loadTestimonialsAdmin() {
-  if (!testimonialsListAdmin) return;
-  testimonialsListAdmin.innerHTML = '<p style="padding: 20px; text-align: center; color: #999; font-size: 0.8rem;">Actualizando testimonios...</p>';
-  
-  try {
-    const q = query(collection(db, "testimonials"), orderBy("createdAt", "desc"));
-    const querySnapshot = await getDocs(q);
-    testimonialsListAdmin.innerHTML = '';
-
-    if (querySnapshot.empty) {
-      testimonialsListAdmin.innerHTML = '<p style="padding: 20px; text-align: center; color: #999; font-size: 0.8rem;">No hay testimonios publicados.</p>';
-      return;
-    }
-
-    querySnapshot.forEach((docSnap) => {
-      const t = docSnap.data();
-      const item = document.createElement('div');
-      item.style.background = "var(--color-warm-white)";
-      item.style.padding = "20px";
-      item.style.borderRadius = "6px";
-      item.style.border = "1px solid #f0f0f0";
-      item.style.display = "flex";
-      item.style.flexDirection = "column";
-      item.style.gap = "12px";
-      item.style.position = "relative";
-      item.style.transition = "transform 0.2s, box-shadow 0.2s";
-      
-      item.innerHTML = `
-        <div style="padding-right: 40px;">
-          <p style="margin: 0; font-size: 0.95rem; color: var(--color-black); line-height: 1.5; font-style: italic;">"${t.quote}"</p>
-          <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
-            <div style="width: 20px; height: 1px; background: var(--admin-accent);"></div>
-            <span style="font-size: 0.75rem; color: var(--admin-accent); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">— ${t.author}</span>
-          </div>
-        </div>
-        <button class="btn-delete-t" data-id="${docSnap.id}" style="position: absolute; top: 15px; right: 15px; background: white; border: 1px solid #eee; color: #d9534f; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s;" title="Eliminar Testimonio">
-          <i data-lucide="trash-2" style="width: 14px;"></i>
-        </button>
-      `;
-
-      item.onmouseenter = () => {
-        item.style.transform = "translateY(-2px)";
-        item.style.boxShadow = "0 5px 15px rgba(0,0,0,0.03)";
-      };
-      item.onmouseleave = () => {
-        item.style.transform = "translateY(0)";
-        item.style.boxShadow = "none";
-      };
-
-      testimonialsListAdmin.appendChild(item);
-    });
-    
-    // Refresh icons
-    lucide.createIcons();
-
-    // Delete listener
-    document.querySelectorAll('.btn-delete-t').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        if (confirm("¿Eliminar este testimonio permanentemente?")) {
-          toggleLoading(true);
-          try {
-            await deleteDoc(doc(db, "testimonials", btn.dataset.id));
-            showToast("Testimonio eliminado con éxito");
-            loadTestimonialsAdmin();
-          } catch (error) {
-            showToast("Error al eliminar: " + error.message, "error");
-          } finally {
-            toggleLoading(false);
-          }
-        }
-      });
-    });
-
-  } catch (error) {
-    console.error("Error Firestore Testimonios:", error);
-    testimonialsListAdmin.innerHTML = '<p style="padding: 20px; color: #d9534f; font-size: 0.8rem;">Error al cargar testimonios.</p>';
-  }
-}
-
-if (testimonialForm) {
-  testimonialForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    toggleLoading(true);
-
-    const author = document.getElementById('t-author').value.trim();
-    const quote = document.getElementById('t-quote').value.trim();
-
-    try {
-      await addDoc(collection(db, "testimonials"), {
-        author,
-        quote,
-        createdAt: new Date()
-      });
-      showToast("¡Nuevo testimonio publicado correctamente!");
-      testimonialForm.reset();
-      loadTestimonialsAdmin();
-    } catch (error) {
-      showToast("Error al publicar: " + error.message, "error");
-    } finally {
-      toggleLoading(false);
-    }
-  });
-}
-
 if (configAnnouncementInput) {
   configAnnouncementInput.addEventListener('input', (e) => {
     if (configAnnouncementPreview) {
@@ -294,7 +197,6 @@ if (configForm) {
       
       if (success) {
         showToast("¡Barra de anuncios actualizada con éxito!");
-        // Actualizar la previsualización local también
         if (configAnnouncementPreview) {
           configAnnouncementPreview.textContent = newAnnouncement;
         }
@@ -303,7 +205,6 @@ if (configForm) {
       }
     } catch (error) {
       console.error("Error al actualizar configuración:", error);
-      // Mostrar el error real de Firebase para diagnóstico
       const errorMsg = error.message.includes("permission-denied") 
         ? "Error: No tienes permisos en Firebase para cambiar la configuración." 
         : "Error: " + error.message;
@@ -314,62 +215,234 @@ if (configForm) {
   });
 }
 
+/* --- Testimonials Logic --- */
+
+async function loadTestimonialsAdmin() {
+  if (!testimonialsListAdmin) return;
+  testimonialsListAdmin.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">Cargando testimonios de la boutique...</p>';
+  
+  try {
+    const q = query(collection(db, "testimonials"), orderBy("createdAt", "desc"));
+    const querySnapshot = await getDocs(q);
+    testimonialsListAdmin.innerHTML = '';
+
+    if (querySnapshot.empty) {
+      testimonialsListAdmin.innerHTML = `
+        <div style="text-align: center; padding: 3rem; background: var(--color-warm-white); border: 1px dashed #ddd; border-radius: 4px;">
+          <p style="color: #666; font-size: 0.85rem; margin-bottom: 1rem;">No hay testimonios en la base de datos.</p>
+          <p style="color: #999; font-size: 0.75rem;">Haz clic en 'Migrar Iniciales' para cargar los comentarios de la web.</p>
+        </div>
+      `;
+      return;
+    }
+
+    querySnapshot.forEach((docSnap) => {
+      const t = docSnap.data();
+      const item = document.createElement('div');
+      item.style.background = "#fff";
+      item.style.padding = "2.5rem";
+      item.style.borderRadius = "2px";
+      item.style.border = "1px solid #f0f0f0";
+      item.style.textAlign = "center";
+      item.style.position = "relative";
+      item.style.transition = "all 0.4s ease";
+      
+      item.innerHTML = `
+        <div style="padding: 0 1rem;">
+          <p style="margin: 0; font-family: var(--font-serif); font-size: 1.25rem; color: var(--color-dark); line-height: 1.6; font-style: italic;">"${t.quote}"</p>
+          <div style="margin-top: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div style="width: 30px; height: 1px; background: var(--admin-accent); opacity: 0.5;"></div>
+            <span style="font-size: 0.75rem; color: var(--color-gray); text-transform: uppercase; font-family: var(--font-sans); letter-spacing: 0.2em; font-weight: 500;">— ${t.author}</span>
+          </div>
+        </div>
+        <button class="btn-delete-t" data-id="${docSnap.id}" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #d9534f; cursor: pointer; padding: 5px; opacity: 0.4; transition: opacity 0.3s;" title="Eliminar">
+          <i data-lucide="x" style="width: 16px;"></i>
+        </button>
+      `;
+
+      item.onmouseenter = () => { if(item.querySelector('.btn-delete-t')) item.querySelector('.btn-delete-t').style.opacity = "1"; item.style.borderColor = "var(--admin-accent)"; };
+      item.onmouseleave = () => { if(item.querySelector('.btn-delete-t')) item.querySelector('.btn-delete-t').style.opacity = "0.4"; item.style.borderColor = "#f0f0f0"; };
+
+      testimonialsListAdmin.appendChild(item);
+    });
+    
+    lucide.createIcons();
+
+    // Listeners para eliminar
+    document.querySelectorAll('.btn-delete-t').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (confirm("¿Eliminar este testimonio de la boutique?")) {
+          toggleLoading(true);
+          try {
+            await deleteDoc(doc(db, "testimonials", btn.dataset.id));
+            showToast("Testimonio eliminado");
+            loadTestimonialsAdmin();
+          } catch (error) {
+            showToast("Error al eliminar: " + error.message, "error");
+          } finally {
+            toggleLoading(false);
+          }
+        }
+      });
+    });
+
+  } catch (error) {
+    console.error("Error Firestore Testimonios:", error);
+    testimonialsListAdmin.innerHTML = '<p style="padding: 2rem; text-align: center; color: #d9534f;">Error al cargar datos.</p>';
+  }
+}
+
+if (testimonialForm) {
+  testimonialForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    toggleLoading(true);
+
+    const tAuthor = document.getElementById('t-author').value.trim();
+    const tQuote = document.getElementById('t-quote').value.trim();
+
+    try {
+      await addDoc(collection(db, "testimonials"), {
+        author: tAuthor,
+        quote: tQuote,
+        createdAt: new Date()
+      });
+      showToast("¡Nuevo testimonio publicado correctamente!");
+      testimonialForm.reset();
+      loadTestimonialsAdmin();
+    } catch (error) {
+      showToast("Error: " + error.message, "error");
+    } finally {
+      toggleLoading(false);
+    }
+  });
+}
+
+if (migrateTBtn) {
+  migrateTBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    toggleLoading(true);
+    const initialTestimonials = [
+      {
+        author: "María Fernanda R.",
+        quote: "La calidad de cada prenda es excepcional. PAU Boutique es mi tienda favorita para encontrar piezas únicas que no encuentro en ningún otro lugar.",
+        createdAt: new Date()
+      },
+      {
+        author: "Carolina S.",
+        quote: "Cada vez que necesito un look especial, confío en PAU. La atención personalizada y las colecciones son simplemente perfectas.",
+        createdAt: new Date()
+      },
+      {
+        author: "Valentina M.",
+        quote: "Elegancia en cada detalle. Las telas, los cortes, los acabados... todo habla de un compromiso real con la moda de calidad.",
+        createdAt: new Date()
+      }
+    ];
+
+    try {
+      for (const t of initialTestimonials) {
+        await addDoc(collection(db, "testimonials"), t);
+      }
+      showToast("¡Testimonios migrados con éxito!");
+      loadTestimonialsAdmin();
+    } catch (error) {
+      showToast("Error: " + error.message, "error");
+    } finally {
+      toggleLoading(false);
+    }
+  });
+}
+
+if (refreshTBtn) {
+  refreshTBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    loadTestimonialsAdmin();
+  });
+}
+
 /* --- Dashboard Init --- */
 
 async function initDashboard() {
   await loadInventory();
 }
 
+/* --- Drag & Drop para el Dropzone --- */
+if (dropzone) {
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    }, false);
+  });
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
+  });
+
+  dropzone.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    handleFiles(files);
+  }, false);
+}
+
 /* --- Cloudinary (Subida Nativa) --- */
 
 if (imagesInput) {
-  imagesInput.addEventListener('change', async (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
-    
-    // Limitar a 3 imágenes en total
-    if (uploadedImages.length + files.length > 3) {
-      showToast("Máximo 3 imágenes permitidas", "error");
-      imagesInput.value = "";
-      return;
-    }
-
-    uploadStatus.textContent = "Preparando imágenes...";
-    
-    for (const file of files) {
-      // 1. Mostrar previsualización local inmediata (opcional, pero útil para feedback)
-      // 2. Subir a Cloudinary
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
-
-      try {
-        uploadStatus.textContent = `Subiendo: ${file.name}...`;
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, {
-          method: 'POST',
-          body: formData
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error?.message || "Error en la subida");
-        }
-
-        const result = await response.json();
-        if (result.secure_url) {
-          uploadedImages.push(result.secure_url);
-          renderPreviews();
-          showToast(`¡${file.name} lista!`, "success");
-        }
-      } catch (error) {
-        console.error("Error al subir a Cloudinary:", error);
-        showToast(`No se pudo subir ${file.name}. Verifica tu configuración de Cloudinary.`, "error");
-      }
-    }
-
-    uploadStatus.textContent = "";
-    imagesInput.value = ""; // Limpiar input para permitir re-selección
+  imagesInput.addEventListener('change', (e) => {
+    handleFiles(e.target.files);
   });
+}
+
+async function handleFiles(fileList) {
+  const files = Array.from(fileList);
+  if (files.length === 0) return;
+  
+  if (uploadedImages.length + files.length > 3) {
+    showToast("Máximo 3 imágenes permitidas", "error");
+    if (imagesInput) imagesInput.value = "";
+    return;
+  }
+
+  uploadStatus.textContent = "Preparando imágenes...";
+  
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+
+    try {
+      uploadStatus.textContent = `Subiendo: ${file.name}...`;
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || "Error en la subida");
+      }
+
+      const result = await response.json();
+      if (result.secure_url) {
+        uploadedImages.push(result.secure_url);
+        renderPreviews();
+        showToast(`¡${file.name} lista!`, "success");
+      }
+    } catch (error) {
+      console.error("Error al subir a Cloudinary:", error);
+      showToast(`No se pudo subir ${file.name}.`, "error");
+    }
+  }
+
+  uploadStatus.textContent = "";
+  if (imagesInput) imagesInput.value = ""; 
 }
 
 function renderPreviews() {
@@ -398,7 +471,7 @@ function renderPreviews() {
   });
 }
 
-/* --- Firestore CRUD --- */
+/* --- Firestore CRUD (Products) --- */
 
 productForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -417,7 +490,6 @@ productForm.addEventListener('submit', async (e) => {
     description: document.getElementById('p-desc').value.trim(),
     category: document.getElementById('p-category').value,
     badge: document.getElementById('p-badge').value.trim(),
-    // Usar las imágenes subidas o una por defecto si está vacío
     images: uploadedImages.length > 0 ? uploadedImages : ['https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'],
     createdAt: new Date()
   };
@@ -426,17 +498,15 @@ productForm.addEventListener('submit', async (e) => {
     await addDoc(collection(db, "products"), productData);
     showToast("¡Pieza añadida con éxito a la boutique!");
     
-    // Limpiar formulario y estado
     productForm.reset();
     uploadedImages = [];
     renderPreviews();
     
-    // Actualizar inventario y cambiar de pestaña
     await loadInventory();
     setTimeout(() => switchModule('inventory'), 500);
   } catch (error) {
     console.error("Error Firestore:", error);
-    showToast("Error al guardar el producto: " + error.message, 'error');
+    showToast("Error al guardar: " + error.message, 'error');
   } finally {
     toggleLoading(false);
   }
@@ -455,8 +525,7 @@ async function loadInventory() {
     querySnapshot.forEach((docSnap) => {
       count++;
       const p = docSnap.data();
-      // Handle both legacy 'image' and new 'images' array
-      const displayImage = p.images && p.images.length > 0 ? p.images[0] : (p.image || 'https://source.unsplash.com/800x1000/?fashion');
+      const displayImage = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80';
       
       const row = document.createElement('tr');
       row.style.borderBottom = "1px solid #f0f0f0";
@@ -474,7 +543,6 @@ async function loadInventory() {
 
     statTotalProducts.textContent = count;
     
-    // Calcular categorías únicas
     const categories = new Set();
     querySnapshot.forEach(docSnap => categories.add(docSnap.data().category));
     if (statCategories) statCategories.textContent = categories.size;
@@ -501,8 +569,6 @@ async function loadInventory() {
   }
 }
 
-/* --- Helpers --- */
-
 function toggleLoading(show) {
   loadingOverlay.style.display = show ? 'flex' : 'none';
 }
@@ -514,12 +580,7 @@ if (migrateBtn) {
       try {
         for (const product of initialProducts) {
           const { id, image, ...data } = product;
-          // Normalizar formato de imágenes (siempre usar arreglo)
-          const productData = {
-            ...data,
-            images: [image],
-            createdAt: new Date()
-          };
+          const productData = { ...data, images: [image], createdAt: new Date() };
           await addDoc(collection(db, "products"), productData);
         }
         showToast("Migración terminada");
