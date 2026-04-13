@@ -51,8 +51,9 @@ export async function renderProducts(filter = 'all') {
         ? `<span class="product-card__badge">${product.badge}</span>`
         : '';
 
-      // Check if image is a full URL (Cloudinary) or just a keyword (Unsplash)
-      const imgSrc = product.image.startsWith('http') ? product.image : getUnsplashUrl(product.image);
+      // Handle both legacy 'image' and new 'images' array
+      const rawImg = (product.images && product.images.length > 0) ? product.images[0] : product.image;
+      const imgSrc = rawImg.startsWith('http') ? rawImg : getUnsplashUrl(rawImg);
 
       return `
         <div class="product-card" data-category="${product.category}" data-id="${product.id}">
@@ -108,7 +109,8 @@ export function openProductModal(id) {
        <span class="product-card__price--sale">S/. ${product.salePrice}</span>`
     : `S/. ${product.price}`;
 
-  const imgSrc = product.image.startsWith('http') ? product.image : getUnsplashUrl(product.image, 800, 1000);
+  const rawImg = (product.images && product.images.length > 0) ? product.images[0] : product.image;
+  const imgSrc = rawImg.startsWith('http') ? rawImg : getUnsplashUrl(rawImg, 800, 1000);
 
   content.innerHTML = `
     <div class="modal__container">

@@ -46,3 +46,40 @@ export function loadStaticImages() {
     }
   });
 }
+
+export function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  
+  let icon = 'check-circle';
+  if (type === 'error') icon = 'alert-circle';
+  if (type === 'warning') icon = 'alert-triangle';
+
+  toast.innerHTML = `
+    <i data-lucide="${icon}" style="width: 18px; height: 18px;"></i>
+    <span>${message}</span>
+  `;
+
+  container.appendChild(toast);
+  
+  // Initialize lucide for the new icon
+  if (window.lucide) {
+    window.lucide.createIcons({
+      attrs: {
+        class: 'lucide-icon'
+      },
+      nameAttr: 'data-lucide'
+    });
+  }
+
+  // Remove after 4 seconds
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(20px)';
+    toast.style.transition = 'all 0.5s ease';
+    setTimeout(() => toast.remove(), 500);
+  }, 4000);
+}

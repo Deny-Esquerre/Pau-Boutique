@@ -4,6 +4,7 @@
 
 import { auth, db, CLOUDINARY_CONFIG } from './firebase-config.js';
 import { products as initialProducts } from './modules/data.js';
+import { showToast } from './modules/utils.js';
 import { 
   signInWithEmailAndPassword, 
   signOut, 
@@ -33,7 +34,7 @@ const productForm = document.getElementById('product-form');
 const inventoryList = document.getElementById('inventory-list');
 const uploadWidgetBtn = document.getElementById('upload-widget');
 const imagePreview = document.getElementById('image-preview');
-const pImageUrlInput = document.getElementById('p-image-url');
+let uploadedImages = []; // Array to store multiple URLs
 
 // DOM Elements - Dashboard
 const statTotalProducts = document.getElementById('stat-total-products');
@@ -60,8 +61,9 @@ loginForm.addEventListener('submit', async (e) => {
   const pass = document.getElementById('login-password').value;
   try {
     await signInWithEmailAndPassword(auth, email, pass);
+    showToast("Bienvenida, Pau");
   } catch (error) {
-    alert("Error: " + error.message);
+    showToast("Error: " + error.message, 'error');
   } finally {
     toggleLoading(false);
   }
@@ -97,15 +99,24 @@ async function initDashboard() {
 
 const myWidget = cloudinary.createUploadWidget({
   cloudName: CLOUDINARY_CONFIG.cloudName, 
-  uploadPreset: CLOUDINARY_CONFIG.uploadPreset
+  uploadPreset: CLOUDINARY_CONFIG.uploadPreset,
+  multiple: true,
+  maxFiles: 3
 }, (error, result) => { 
   if (!error && result && result.event === "success") { 
-    const url = result.info.secure_url;
-    pImageUrlInput.value = url;
-    imagePreview.style.display = 'block';
-    imagePreview.querySelector('img').src = url;
+    uploadedImages.push(result.info.secure_url);
+    renderPreviews();
+    showToast("Imagen subida correctamente");
   }
 });
+
+function renderPreviews() {
+  imagePreview.innerHTML = uploadedImages.map((url, index) => `
+    <div class="preview-item">
+      <img src="${url}" alt="Preview ${index + 1}">
+    </div>
+  `).join('');
+}
 
 if (uploadWidgetBtn) uploadWidgetBtn.addEventListener("click", () => myWidget.open(), false);
 
@@ -121,19 +132,20 @@ productForm.addEventListener('submit', async (e) => {
     description: document.getElementById('p-desc').value,
     category: document.getElementById('p-category').value,
     badge: document.getElementById('p-badge').value,
-    image: pImageUrlInput.value || 'https://source.unsplash.com/800x1000/?fashion',
+    images: uploadedImages.length > 0 ? uploadedImages : ['https://source.unsplash.com/800x1000/?fashion'],
     createdAt: new Date()
   };
 
   try {
     await addDoc(collection(db, "products"), productData);
-    alert("Producto añadido con éxito");
+    showToast("Pieza guardada en la colección con éxito");
     productForm.reset();
-    imagePreview.style.display = 'none';
+    uploadedImages = [];
+    imagePreview.innerHTML = '';
     loadInventory();
     switchModule('inventory');
   } catch (error) {
-    alert("Error: " + error.message);
+    showToast("Error: " + error.message, 'error');
   } finally {
     toggleLoading(false);
   }
@@ -152,10 +164,13 @@ async function loadInventory() {
     querySnapshot.forEach((docSnap) => {
       count++;
       const p = docSnap.data();
+      // Handle both legacy 'image' and new 'images' array
+      const displayImage = p.images && p.images.length > 0 ? p.images[0] : (p.image || 'https://source.unsplash.com/800x1000/?fashion');
+      
       const row = document.createElement('tr');
       row.style.borderBottom = "1px solid #f0f0f0";
       row.innerHTML = `
-        <td style="padding: 15px;"><img src="${p.image}" style="height: 50px; width: 40px; object-fit: cover; border-radius: 4px;"></td>
+        <td style="padding: 15px;"><img src="${displayImage}" style="height: 50px; width: 40px; object-fit: cover; border-radius: 4px;"></td>
         <td style="padding: 15px; font-weight: 500;">${p.name}</td>
         <td style="padding: 15px; color: #666;">${p.category}</td>
         <td style="padding: 15px; font-weight: 600;">S/. ${p.price.toFixed(2)}</td>
@@ -174,9 +189,10 @@ async function loadInventory() {
           toggleLoading(true);
           try {
             await deleteDoc(doc(db, "products", btn.dataset.id));
+            showToast("Pieza eliminada");
             loadInventory();
           } catch (error) {
-            alert("Error: " + error.message);
+            showToast("Error: " + error.message, 'error');
           } finally {
             toggleLoading(false);
           }
@@ -204,10 +220,10 @@ if (migrateBtn) {
           const { id, ...data } = product;
           await addDoc(collection(db, "products"), { ...data, createdAt: new Date() });
         }
-        alert("Migración terminada");
+        showToast("Migración terminada");
         loadInventory();
       } catch (error) {
-        alert("Error: " + error.message);
+        showToast("Error: " + error.message, 'error');
       } finally {
         toggleLoading(false);
       }
