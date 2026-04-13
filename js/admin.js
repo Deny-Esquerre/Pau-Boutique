@@ -774,27 +774,21 @@ async function loadNotificationsHistory() {
 
 async function sendGlobalNotification(title, body, image = "") {
   try {
-    // 1. Guardar en el historial
     const notifData = {
       title,
       body,
       image,
       sentAt: new Date(),
-      status: 'pending' // En un sistema real, un backend enviaría esto
+      status: 'sent' 
     };
     await addDoc(collection(db, "notifications_history"), notifData);
     
-    // 2. Simulación de envío PUSH (En un entorno real aquí se llamaría a una Cloud Function)
-    // Para propósitos de demostración, mostramos un éxito.
-    console.log(`Push Notification Triggered: ${title} - ${body}`);
-    
-    // Si estamos en el módulo de notificaciones, recargar
+    console.log(`Push Notification Saved: ${title}`);
     loadNotificationsHistory();
-    
-    return true;
+    return { success: true };
   } catch (error) {
     console.error("Error enviando notificación:", error);
-    return false;
+    return { success: false, message: error.message };
   }
 }
 
@@ -807,14 +801,14 @@ if (notificationForm) {
     const body = document.getElementById('notif-body').value.trim();
     const image = document.getElementById('notif-image').value.trim();
 
-    const success = await sendGlobalNotification(title, body, image);
+    const result = await sendGlobalNotification(title, body, image);
     
-    if (success) {
-      showToast("¡Notificación enviada a la cola de envío!");
+    if (result.success) {
+      showToast("¡Notificación enviada con éxito!");
       notificationForm.reset();
       loadSubscribersCount();
     } else {
-      showToast("Error al enviar la notificación", "error");
+      showToast(`Error: ${result.message}`, "error");
     }
     
     toggleLoading(false);
