@@ -19,7 +19,8 @@
 
   <!-- Announcement Bar -->
   <div class="announcement-bar">
-    <p id="announcement-text">&nbsp;</p>
+    <p id="announcement-text">ENVÍO GRATIS EN COMPRAS MAYORES A S/. 200 &nbsp;&bull;&nbsp; NUEVA COLECCIÓN OTOÑO 2026
+    </p>
   </div>
 
   <!-- Header -->
@@ -148,13 +149,15 @@
         <span class="section-header__line"></span>
       </div>
 
-      <div class="products__filters" id="category-filters">
+      <div class="products__filters">
         <button class="filter-btn active" data-filter="all">Todos</button>
-        <!-- Categories dynamic -->
+        <button class="filter-btn" data-filter="vestidos">Vestidos</button>
+        <button class="filter-btn" data-filter="abrigos">Abrigos</button>
+        <button class="filter-btn" data-filter="accesorios">Accesorios</button>
       </div>
 
       <div class="products__grid" id="products-grid">
-        <!-- Products dynamic -->
+        <!-- Products injected by JS -->
       </div>
 
       <div class="products__cta">
@@ -195,8 +198,25 @@
       </div>
 
       <div class="testimonials__carousel" id="testimonials-carousel">
-        <!-- Injected by Firebase -->
-        <p style="text-align: center; color: var(--color-gray); font-family: var(--font-serif); font-style: italic; padding: 2rem;">Cargando testimonios de nuestras clientas...</p>
+        <div class="testimonial active">
+          <p class="testimonial__quote">"La calidad de cada prenda es excepcional. PAU Boutique es mi tienda favorita
+            para encontrar piezas únicas que no encuentro en ningún otro lugar."</p>
+          <span class="testimonial__author">— María Fernanda R.</span>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial__quote">"Cada vez que necesito un look especial, confío en PAU. La atención
+            personalizada y las colecciones son simplemente perfectas."</p>
+          <span class="testimonial__author">— Carolina S.</span>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial__quote">"Elegancia en cada detalle. Las telas, los cortes, los acabados... todo habla de
+            un compromiso real con la moda de calidad."</p>
+          <span class="testimonial__author">— Valentina M.</span>
+        </div>
+        <!-- Testimonials injected by Firebase -->
+        <p
+          style="text-align: center; color: var(--color-gray); font-family: var(--font-serif); font-style: italic; padding: 2rem;">
+          Cargando testimonios de nuestras clientas...</p>
       </div>
       <div class="testimonials__dots" id="testimonial-dots"></div>
     </div>
@@ -288,12 +308,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- Product Modal -->
-  <div class="modal" id="product-modal">
-    <button class="modal__close" id="modal-close">&times;</button>
-    <div id="modal-content"></div>
-  </div>
 
   <!-- Overlay -->
   <div class="overlay" id="overlay"></div>
