@@ -1,12 +1,11 @@
 /* ===================================================
-   ADMIN DASHBOARD LOGIC (Firebase & Cloudinary)
+   ADMIN DASHBOARD LOGIC (Modular Version)
    =================================================== */
 
 import { auth, db, CLOUDINARY_CONFIG } from './firebase-config.js';
 import { products as initialProducts } from './modules/data.js';
 import { 
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
   signOut, 
   onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
@@ -20,88 +19,81 @@ import {
   orderBy 
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-// DOM Elements
+// DOM Elements - Shell
 const loginSection = document.getElementById('login-section');
-const dashboardSection = document.getElementById('dashboard-section');
+const adminWrapper = document.getElementById('admin-wrapper');
 const loginForm = document.getElementById('login-form');
 const logoutBtn = document.getElementById('logout-btn');
-const migrateBtn = document.getElementById('migrate-btn');
+const sidebarLinks = document.querySelectorAll('.sidebar__link');
+const modules = document.querySelectorAll('.module-section');
+const loadingOverlay = document.getElementById('loading-overlay');
+
+// DOM Elements - Form & List
 const productForm = document.getElementById('product-form');
 const inventoryList = document.getElementById('inventory-list');
 const uploadWidgetBtn = document.getElementById('upload-widget');
 const imagePreview = document.getElementById('image-preview');
 const pImageUrlInput = document.getElementById('p-image-url');
-const loadingOverlay = document.getElementById('loading-overlay');
-const tempRegisterBtn = document.getElementById('temp-register');
 
-/* --- Authentication --- */
+// DOM Elements - Dashboard
+const statTotalProducts = document.getElementById('stat-total-products');
+const quickLinks = document.querySelectorAll('.quick-link');
+const migrateBtn = document.getElementById('migrate-btn');
 
-// Monitor Auth State
+/* --- Authentication & Session --- */
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    showDashboard();
-    loadInventory();
+    loginSection.style.display = 'none';
+    adminWrapper.style.display = 'flex';
+    initDashboard();
   } else {
-    showLogin();
+    loginSection.style.display = 'flex';
+    adminWrapper.style.display = 'none';
   }
 });
 
-// Login
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   toggleLoading(true);
   const email = document.getElementById('login-email').value;
   const pass = document.getElementById('login-password').value;
-
   try {
     await signInWithEmailAndPassword(auth, email, pass);
   } catch (error) {
-    alert("Error de acceso: " + error.message);
+    alert("Error: " + error.message);
   } finally {
     toggleLoading(false);
   }
 });
 
-// Temporary Register (Only for first-time setup)
-if (tempRegisterBtn) {
-  tempRegisterBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const pass = document.getElementById('login-password').value;
-
-    if (!email || !pass) {
-      alert("Por favor, ingresa los datos en el formulario antes de registrarte.");
-      return;
-    }
-
-    if (confirm("¿Deseas crear esta cuenta como administradora? Úsalo solo una vez.")) {
-      toggleLoading(true);
-      try {
-        await createUserWithEmailAndPassword(auth, email, pass);
-        alert("Cuenta creada con éxito. Ahora puedes gestionar tu boutique.");
-      } catch (error) {
-        alert("Error al crear cuenta: " + error.message);
-      } finally {
-        toggleLoading(false);
-      }
-    }
-  });
-}
-
-// Logout
 logoutBtn.addEventListener('click', () => signOut(auth));
 
-function showDashboard() {
-  loginSection.style.display = 'none';
-  dashboardSection.style.display = 'block';
+/* --- Navigation --- */
+
+function switchModule(moduleId) {
+  modules.forEach(mod => mod.id === `mod-${moduleId}` ? mod.classList.add('active') : mod.classList.remove('active'));
+  sidebarLinks.forEach(link => link.dataset.mod === moduleId ? link.classList.add('active') : link.classList.remove('active'));
 }
 
-function showLogin() {
-  loginSection.style.display = 'block';
-  dashboardSection.style.display = 'none';
+sidebarLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchModule(link.dataset.mod);
+  });
+});
+
+quickLinks.forEach(btn => {
+  btn.addEventListener('click', () => switchModule(btn.dataset.mod));
+});
+
+/* --- Dashboard Init --- */
+
+async function initDashboard() {
+  await loadInventory();
 }
 
-/* --- Cloudinary Widget --- */
+/* --- Cloudinary --- */
 
 const myWidget = cloudinary.createUploadWidget({
   cloudName: CLOUDINARY_CONFIG.cloudName, 
@@ -112,15 +104,13 @@ const myWidget = cloudinary.createUploadWidget({
     pImageUrlInput.value = url;
     imagePreview.style.display = 'block';
     imagePreview.querySelector('img').src = url;
-    alert("Imagen subida con éxito");
   }
 });
 
-uploadWidgetBtn.addEventListener("click", () => myWidget.open(), false);
+if (uploadWidgetBtn) uploadWidgetBtn.addEventListener("click", () => myWidget.open(), false);
 
 /* --- Firestore CRUD --- */
 
-// Add Product
 productForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   toggleLoading(true);
@@ -131,57 +121,62 @@ productForm.addEventListener('submit', async (e) => {
     description: document.getElementById('p-desc').value,
     category: document.getElementById('p-category').value,
     badge: document.getElementById('p-badge').value,
-    image: pImageUrlInput.value || 'https://source.unsplash.com/800x1000/?fashion', // fallback
+    image: pImageUrlInput.value || 'https://source.unsplash.com/800x1000/?fashion',
     createdAt: new Date()
   };
 
   try {
     await addDoc(collection(db, "products"), productData);
-    alert("Producto guardado correctamente");
+    alert("Producto añadido con éxito");
     productForm.reset();
     imagePreview.style.display = 'none';
     loadInventory();
+    switchModule('inventory');
   } catch (error) {
-    alert("Error al guardar: " + error.message);
+    alert("Error: " + error.message);
   } finally {
     toggleLoading(false);
   }
 });
 
-// Load Inventory
 async function loadInventory() {
-  inventoryList.innerHTML = '<tr><td colspan="5">Cargando inventario...</td></tr>';
+  if (!inventoryList) return;
+  inventoryList.innerHTML = '<tr><td colspan="5" style="padding: 20px; text-align: center;">Actualizando inventario...</td></tr>';
   
   try {
     const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
     const querySnapshot = await getDocs(q);
     inventoryList.innerHTML = '';
+    let count = 0;
 
     querySnapshot.forEach((docSnap) => {
+      count++;
       const p = docSnap.data();
       const row = document.createElement('tr');
+      row.style.borderBottom = "1px solid #f0f0f0";
       row.innerHTML = `
-        <td><img src="${p.image}" style="height: 50px; width: 40px; object-fit: cover;"></td>
-        <td>${p.name}</td>
-        <td><span class="badge" style="text-transform: uppercase; font-size: 0.7rem;">${p.category}</span></td>
-        <td>$${p.price.toFixed(2)}</td>
-        <td>
-          <button class="btn-delete" data-id="${docSnap.id}">Eliminar</button>
+        <td style="padding: 15px;"><img src="${p.image}" style="height: 50px; width: 40px; object-fit: cover; border-radius: 4px;"></td>
+        <td style="padding: 15px; font-weight: 500;">${p.name}</td>
+        <td style="padding: 15px; color: #666;">${p.category}</td>
+        <td style="padding: 15px; font-weight: 600;">S/. ${p.price.toFixed(2)}</td>
+        <td style="padding: 15px;">
+          <button class="btn-delete" data-id="${docSnap.id}" style="color: #d9534f; border: none; background: none; cursor: pointer; text-decoration: underline;">Eliminar</button>
         </td>
       `;
       inventoryList.appendChild(row);
     });
 
-    // Attach Delete Listeners
+    statTotalProducts.textContent = count;
+
     document.querySelectorAll('.btn-delete').forEach(btn => {
       btn.addEventListener('click', async () => {
-        if (confirm("¿Estás seguro de eliminar este producto?")) {
+        if (confirm("¿Eliminar esta pieza de la colección?")) {
           toggleLoading(true);
           try {
             await deleteDoc(doc(db, "products", btn.dataset.id));
             loadInventory();
           } catch (error) {
-            alert("Error al eliminar: " + error.message);
+            alert("Error: " + error.message);
           } finally {
             toggleLoading(false);
           }
@@ -190,33 +185,29 @@ async function loadInventory() {
     });
 
   } catch (error) {
-    inventoryList.innerHTML = '<tr><td colspan="5">Error al cargar datos.</td></tr>';
+    inventoryList.innerHTML = '<tr><td colspan="5">Error al conectar con la base de datos.</td></tr>';
   }
 }
 
 /* --- Helpers --- */
+
 function toggleLoading(show) {
   loadingOverlay.style.display = show ? 'flex' : 'none';
 }
 
-// Data Migration Utility
 if (migrateBtn) {
   migrateBtn.addEventListener('click', async () => {
-    if (confirm("¿Deseas migrar los productos iniciales de data.js a Firestore? Esto podría duplicar datos si ya los migraste.")) {
+    if (confirm("¿Migrar productos iniciales?")) {
       toggleLoading(true);
       try {
         for (const product of initialProducts) {
-          // Prepare data (Firestore doesn't need numerical ID in the body as it generates its own)
           const { id, ...data } = product;
-          await addDoc(collection(db, "products"), {
-            ...data,
-            createdAt: new Date()
-          });
+          await addDoc(collection(db, "products"), { ...data, createdAt: new Date() });
         }
-        alert("Migración completada con éxito");
+        alert("Migración terminada");
         loadInventory();
       } catch (error) {
-        alert("Error en la migración: " + error.message);
+        alert("Error: " + error.message);
       } finally {
         toggleLoading(false);
       }

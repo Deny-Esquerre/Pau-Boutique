@@ -14,136 +14,178 @@
   <link rel="stylesheet" href="css/main.css">
   <style>
     :root {
-      --admin-bg: #f8f9fa;
-      --admin-card-bg: #ffffff;
+      --admin-sidebar-width: 260px;
+      --admin-header-height: 60px;
+      --admin-bg: #f5f6f8;
+      --admin-sidebar-bg: #1a1a1a;
+      --admin-accent: #c4a484; /* Beige dorado */
     }
     
     body.admin-body {
       background-color: var(--admin-bg);
       font-family: var(--font-sans);
-      color: var(--color-black);
-      padding-top: var(--header-height);
-    }
-
-    .admin-container {
-      max-width: 1000px;
-      margin: 40px auto;
-      padding: 0 var(--space-md);
-    }
-
-    /* Login Form */
-    .login-box {
-      max-width: 400px;
-      margin: 100px auto;
-      background: var(--admin-card-bg);
-      padding: var(--space-lg);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-      border-radius: 4px;
-      text-align: center;
-    }
-
-    .login-box h2 {
-      font-family: var(--font-serif);
-      margin-bottom: var(--space-md);
-    }
-
-    .form-group {
-      margin-bottom: var(--space-md);
-      text-align: left;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 8px;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid var(--color-beige);
-      font-family: var(--font-sans);
-      outline: none;
-    }
-
-    /* Dashboard */
-    .dashboard-section {
-      display: none; /* Hidden by default */
-    }
-
-    .admin-header {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--space-lg);
-      padding-bottom: var(--space-sm);
-      border-bottom: 1px solid var(--color-beige);
+      min-height: 100vh;
+      margin: 0;
+      overflow: hidden;
     }
 
-    .admin-card {
-      background: var(--admin-card-bg);
-      padding: var(--space-md);
-      box-shadow: 0 5px 20px rgba(0,0,0,0.03);
-      border-radius: 4px;
+    /* Login Box (Full screen overlay when not logged in) */
+    #login-section {
+      position: fixed;
+      inset: 0;
+      background: white;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 400px;
+      padding: var(--space-lg);
+      text-align: center;
+    }
+
+    /* Layout Wrapper */
+    .admin-wrapper {
+      display: none; /* Shown after login */
+      flex: 1;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--admin-sidebar-width);
+      background: var(--admin-sidebar-bg);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-md) 0;
+      transition: all 0.3s;
+    }
+
+    .sidebar__logo {
+      padding: 0 var(--space-md) var(--space-lg);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
       margin-bottom: var(--space-md);
     }
 
-    .product-form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-md);
+    .sidebar__logo img {
+      height: 40px;
+      filter: brightness(0) invert(1);
     }
 
-    .upload-area {
-      border: 2px dashed var(--color-beige);
+    .sidebar__nav {
+      flex: 1;
+    }
+
+    .sidebar__link {
+      display: flex;
+      align-items: center;
+      padding: 12px var(--space-md);
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar__link:hover, .sidebar__link.active {
+      color: white;
+      background: rgba(255,255,255,0.05);
+      border-left-color: var(--admin-accent);
+    }
+
+    .sidebar__footer {
       padding: var(--space-md);
-      text-align: center;
-      cursor: pointer;
-      transition: background 0.3s;
+      border-top: 1px solid rgba(255,255,255,0.1);
     }
 
-    .upload-area:hover {
-      background: var(--color-warm-white);
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-lg);
     }
 
-    /* Product Table */
-    .admin-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: var(--space-md);
+    .module-section {
+      display: none;
+      animation: fadeIn 0.4s ease-out;
     }
 
-    .admin-table th {
-      text-align: left;
-      padding: 12px;
-      background: var(--color-warm-white);
+    .module-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-header {
+      margin-bottom: var(--space-lg);
+    }
+
+    .content-header h1 {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      margin: 0;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .stat-card {
+      background: white;
+      padding: var(--space-md);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .stat-card__label {
       font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      color: var(--color-gray);
+      margin-bottom: 5px;
     }
 
-    .admin-table td {
-      padding: 12px;
-      border-bottom: 1px solid var(--color-beige);
-      font-size: 0.9rem;
+    .stat-card__value {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--color-black);
     }
 
-    .btn-delete {
-      color: #d9534f;
+    /* Utility */
+    .btn--logout {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      width: 100%;
+      padding: 10px;
+      font-size: 0.8rem;
       cursor: pointer;
-      text-decoration: underline;
-      background: none;
-      border: none;
+    }
+
+    .btn--logout:hover {
+      background: #d9534f;
+      border-color: #d9534f;
     }
 
     #loading-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(255,255,255,0.8);
-      z-index: 9999;
+      background: rgba(255,255,255,0.9);
+      z-index: 2000;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       display: none;
@@ -152,124 +194,177 @@
 </head>
 <body class="admin-body">
 
-  <div id="loading-overlay">Cargando...</div>
+  <div id="loading-overlay">
+    <div class="loader"></div>
+    <p style="margin-top: 15px; font-size: 0.9rem; letter-spacing: 0.1em;">PROCESANDO...</p>
+  </div>
 
-  <!-- Main Header (Reused for consistent navigation) -->
-  <header class="header">
-    <div class="container header__container">
-      <a href="index.html" class="header__logo">
-        <img src="images/logo/logo.png" alt="PAU Boutique" class="header__logo-img" style="height: 50px;">
-      </a>
-      <div id="auth-status" style="font-size: 0.8rem; letter-spacing: 0.1em;">
-        <!-- Filled by JS -->
-      </div>
-    </div>
-  </header>
-
-  <div class="admin-container">
-    
-    <!-- Login Form -->
-    <div id="login-section" class="login-box">
-      <h2>Acceso Administrativo</h2>
+  <!-- Login Section -->
+  <section id="login-section">
+    <div class="login-box">
+      <img src="images/logo/logo.png" alt="PAU Boutique" style="height: 60px; margin-bottom: 2rem;">
+      <h2 style="font-family: var(--font-serif);">Panel Administrativo</h2>
       <form id="login-form">
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="login-email" class="form-control" required>
+        <div class="form-group" style="text-align: left; margin-bottom: 1rem;">
+          <label style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;">Email</label>
+          <input type="email" id="login-email" class="form-control" required style="width: 100%; padding: 12px;">
         </div>
-        <div class="form-group">
-          <label>Contraseña</label>
-          <input type="password" id="login-password" class="form-control" required>
+        <div class="form-group" style="text-align: left; margin-bottom: 1.5rem;">
+          <label style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;">Contraseña</label>
+          <input type="password" id="login-password" class="form-control" required style="width: 100%; padding: 12px;">
         </div>
         <button type="submit" class="btn btn--primary" style="width: 100%;">Ingresar</button>
-        <p style="margin-top: 20px; font-size: 0.75rem; color: var(--color-gray);">
-          ¿No tienes cuenta? <a href="#" id="temp-register" style="text-decoration: underline;">Regístrate aquí (Solo inicial)</a>
-        </p>
       </form>
     </div>
+  </section>
 
-    <!-- Dashboard -->
-    <div id="dashboard-section" class="dashboard-section">
-      <div class="admin-header">
-        <h1>Gestión de Productos</h1>
-        <div>
-          <button id="migrate-btn" class="btn" style="background: #eee; border: 1px solid #ccc; padding: 8px 15px; margin-right: 10px; font-size: 0.7rem;">Migrar Datos Iniciales</button>
-          <button id="logout-btn" class="btn btn--primary" style="padding: 8px 20px;">Cerrar Sesión</button>
-        </div>
+  <!-- Admin Wrapper -->
+  <div class="admin-wrapper" id="admin-wrapper">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <img src="images/logo/logo.png" alt="PAU">
       </div>
+      <nav class="sidebar__nav">
+        <a href="#" class="sidebar__link active" data-mod="dashboard">
+          <span>📊 Dashboard</span>
+        </a>
+        <a href="#" class="sidebar__link" data-mod="products">
+          <span>👗 Productos</span>
+        </a>
+        <a href="#" class="sidebar__link" data-mod="inventory">
+          <span>📦 Inventario</span>
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <button id="logout-btn" class="btn--logout">Cerrar Sesión</button>
+      </div>
+    </aside>
 
-      <div class="admin-card">
-        <h3>Añadir Nuevo Producto</h3>
-        <form id="product-form">
-          <div class="product-form-grid">
-            <div class="form-group">
-              <label>Nombre del Producto</label>
-              <input type="text" id="p-name" class="form-control" required>
-            </div>
-            <div class="form-group">
-              <label>Precio</label>
-              <input type="number" id="p-price" class="form-control" step="0.01" required>
-            </div>
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+      
+      <!-- Dashboard Module -->
+      <section id="mod-dashboard" class="module-section active">
+        <div class="content-header">
+          <h1>Resumen de Boutique</h1>
+          <p>Bienvenida al panel de control de Pau Boutique.</p>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <p class="stat-card__label">Total Productos</p>
+            <p class="stat-card__value" id="stat-total-products">0</p>
           </div>
-          <div class="form-group">
-            <label>Descripción</label>
-            <textarea id="p-desc" class="form-control" rows="3" required></textarea>
+          <div class="stat-card">
+            <p class="stat-card__label">Categorías</p>
+            <p class="stat-card__value" id="stat-categories">3</p>
           </div>
-          <div class="product-form-grid">
-            <div class="form-group">
-              <label>Categoría</label>
-              <select id="p-category" class="form-control">
-                <option value="vestidos">Vestidos</option>
-                <option value="abrigos">Abrigos</option>
-                <option value="accesorios">Accesorios</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Etiqueta (Opcional)</label>
-              <input type="text" id="p-badge" class="form-control" placeholder="Ej: Nuevo, Sale">
-            </div>
+          <div class="stat-card">
+            <p class="stat-card__label">Imágenes Cloudinary</p>
+            <p class="stat-card__value" id="stat-images">Activo</p>
           </div>
+        </div>
 
-          <div class="form-group">
-            <label>Imagen del Producto</label>
-            <div id="upload-widget" class="upload-area">
-              <p>Haz clic para subir imagen (Cloudinary)</p>
-              <input type="hidden" id="p-image-url">
-              <div id="image-preview" style="margin-top: 10px; display: none;">
-                <img src="" alt="Preview" style="max-height: 100px;">
+        <div class="admin-card">
+          <h3>Acciones Rápidas</h3>
+          <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn btn--outline-dark quick-link" data-mod="products">Nuevo Producto</button>
+            <button id="migrate-btn" class="btn btn--outline-dark">Re-Migrar Datos</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products Module -->
+      <section id="mod-products" class="module-section">
+        <div class="content-header">
+          <h1>Gestión de Productos</h1>
+          <p>Añade o edita piezas de tu colección.</p>
+        </div>
+
+        <div class="admin-card" style="background: white; padding: 2rem; border-radius: 8px;">
+          <h3>Añadir Nueva Pieza</h3>
+          <form id="product-form" style="margin-top: 1.5rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="p-name" class="form-control" required style="width: 100%; border: 1px solid #ddd; padding: 10px;">
+              </div>
+              <div class="form-group">
+                <label>Precio (S/.)</label>
+                <input type="number" id="p-price" class="form-control" step="0.01" required style="width: 100%; border: 1px solid #ddd; padding: 10px;">
               </div>
             </div>
-          </div>
+            
+            <div class="form-group" style="margin-top: 1rem;">
+              <label>Descripción</label>
+              <textarea id="p-desc" class="form-control" rows="3" required style="width: 100%; border: 1px solid #ddd; padding: 10px;"></textarea>
+            </div>
 
-          <button type="submit" class="btn btn--primary" style="width: 100%; margin-top: 20px;">Guardar Producto</button>
-        </form>
-      </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+              <div class="form-group">
+                <label>Categoría</label>
+                <select id="p-category" class="form-control" style="width: 100%; border: 1px solid #ddd; padding: 10px;">
+                  <option value="vestidos">Vestidos</option>
+                  <option value="abrigos">Abrigos</option>
+                  <option value="accesorios">Accesorios</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Etiqueta (Opcional)</label>
+                <input type="text" id="p-badge" class="form-control" placeholder="Ej: Nuevo" style="width: 100%; border: 1px solid #ddd; padding: 10px;">
+              </div>
+            </div>
 
-      <div class="admin-card">
-        <h3>Productos en Inventario</h3>
-        <div style="overflow-x: auto;">
-          <table class="admin-table">
-            <thead>
+            <div class="form-group" style="margin-top: 1.5rem;">
+              <label>Imagen</label>
+              <div id="upload-widget" style="border: 2px dashed #ddd; padding: 2rem; text-align: center; cursor: pointer;">
+                <p>Haz clic para subir a Cloudinary</p>
+                <input type="hidden" id="p-image-url">
+                <div id="image-preview" style="margin-top: 10px; display: none;">
+                  <img src="" alt="Preview" style="max-height: 120px; border-radius: 4px;">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn--primary" style="width: 100%; margin-top: 2rem;">Guardar en Boutique</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Inventory Module -->
+      <section id="mod-inventory" class="module-section">
+        <div class="content-header">
+          <h1>Inventario</h1>
+          <p>Control de existencias y productos publicados.</p>
+        </div>
+
+        <div class="admin-card" style="background: white; border-radius: 8px; overflow: hidden;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background: #f8f9fa;">
               <tr>
-                <th>Imagen</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Precio</th>
-                <th>Acciones</th>
+                <th style="padding: 15px; text-align: left; font-size: 0.8rem; text-transform: uppercase;">Pieza</th>
+                <th style="padding: 15px; text-align: left; font-size: 0.8rem; text-transform: uppercase;">Nombre</th>
+                <th style="padding: 15px; text-align: left; font-size: 0.8rem; text-transform: uppercase;">Cat.</th>
+                <th style="padding: 15px; text-align: left; font-size: 0.8rem; text-transform: uppercase;">Precio</th>
+                <th style="padding: 15px; text-align: left; font-size: 0.8rem; text-transform: uppercase;">Acción</th>
               </tr>
             </thead>
             <tbody id="inventory-list">
-              <!-- Filled by JS -->
+              <!-- JS Injected -->
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+      </section>
+
+    </main>
   </div>
 
-  <!-- Cloudinary Upload Widget Script -->
+  <!-- Cloudinary -->
   <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
   
-  <!-- Admin JS -->
+  <!-- Scripts -->
   <script type="module" src="js/admin.js"></script>
 </body>
 </html>
