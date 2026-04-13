@@ -175,7 +175,11 @@ if (configForm) {
       }
     } catch (error) {
       console.error("Error al actualizar configuración:", error);
-      showToast("Error: No se pudo actualizar. Verifica tu conexión.", "error");
+      // Mostrar el error real de Firebase para diagnóstico
+      const errorMsg = error.message.includes("permission-denied") 
+        ? "Error: No tienes permisos en Firebase para cambiar la configuración." 
+        : "Error: " + error.message;
+      showToast(errorMsg, "error");
     } finally {
       toggleLoading(false);
     }
