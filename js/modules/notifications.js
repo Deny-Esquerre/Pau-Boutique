@@ -19,10 +19,13 @@ export async function initNotifications() {
       const permission = await Notification.requestPermission();
       console.log('Permiso:', permission);
       if (permission === 'granted') {
-        // Registrar Service Worker usando una ruta relativa para mayor compatibilidad (ej: GitHub Pages)
+        showToast("Permiso concedido. Registrando servicio...", "warning");
+        // Registrar Service Worker usando una ruta relativa
         const registration = await navigator.serviceWorker.register('firebase-messaging-sw.js');
         console.log('Service Worker registrado:', registration);
         await saveTokenToFirestore(registration);
+      } else {
+        showToast("Bloqueaste las notificaciones. Cámbialo en la barra de direcciones.", "warning");
       }
     } catch (error) {
       console.error('Error al solicitar permiso de notificación:', error);
@@ -69,6 +72,7 @@ export async function initNotifications() {
  */
 async function saveTokenToFirestore(registration) {
   try {
+    showToast("Conectando con Google Firebase...", "warning");
     const currentToken = await getToken(messaging, { 
       vapidKey: VAPID_KEY,
       serviceWorkerRegistration: registration
