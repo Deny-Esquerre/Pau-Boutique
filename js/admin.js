@@ -39,7 +39,8 @@ const configAnnouncementPreview = document.getElementById('announcement-preview'
 // DOM Elements - Form & List
 const productForm = document.getElementById('product-form');
 const inventoryList = document.getElementById('inventory-list');
-const uploadWidgetBtn = document.getElementById('upload-widget');
+const imagesInput = document.getElementById('p-images-input');
+const uploadStatus = document.getElementById('upload-status');
 const imagePreview = document.getElementById('image-preview');
 let uploadedImages = []; // Array to store multiple URLs
 
@@ -162,50 +163,65 @@ async function initDashboard() {
   await loadInventory();
 }
 
-/* --- Cloudinary --- */
+/* --- Cloudinary (Subida Nativa) --- */
 
-const myWidget = cloudinary.createUploadWidget({
-  cloudName: CLOUDINARY_CONFIG.cloudName, 
-  uploadPreset: CLOUDINARY_CONFIG.uploadPreset,
-  sources: ['local', 'camera'], // Solo archivos locales y cámara
-  language: 'es', // Idioma español
-  clientAllowedFormats: ['png', 'jpeg', 'jpg', 'webp'],
-  multiple: true,
-  maxFiles: 3,
-  styles: {
-    palette: {
-      window: "#FFFFFF",
-      sourceBg: "#F4F4F5",
-      windowBorder: "#90A0B3",
-      tabIcon: "#000000",
-      inactiveTabIcon: "#6E706E",
-      menuIcons: "#000000",
-      link: "#C4A484",
-      action: "#000000",
-      inProgress: "#C4A484",
-      complete: "#20B832",
-      error: "#E03C31",
-      textDark: "#000000",
-      textLight: "#FFFFFF"
+if (imagesInput) {
+  imagesInput.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    
+    if (uploadedImages.length + files.length > 3) {
+      showToast("Máximo 3 imágenes permitidas", "error");
+      return;
     }
-  }
-}, (error, result) => { 
-  if (!error && result && result.event === "success") { 
-    uploadedImages.push(result.info.secure_url);
-    renderPreviews();
-    showToast("Imagen subida correctamente");
-  }
-});
+
+    uploadStatus.textContent = "Subiendo fotos...";
+    
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+
+      try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+        if (result.secure_url) {
+          uploadedImages.push(result.secure_url);
+          renderPreviews();
+          showToast("Imagen lista", "success");
+        }
+      } catch (error) {
+        console.error("Error al subir a Cloudinary:", error);
+        showToast("Error al subir una imagen", "error");
+      }
+    }
+
+    uploadStatus.textContent = "";
+    imagesInput.value = ""; // Limpiar input para permitir re-selección
+  });
+}
 
 function renderPreviews() {
   imagePreview.innerHTML = uploadedImages.map((url, index) => `
-    <div class="preview-item">
-      <img src="${url}" alt="Preview ${index + 1}">
+    <div class="preview-item" style="position: relative; display: inline-block; margin-right: 10px;">
+      <img src="${url}" alt="Preview ${index + 1}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
+      <button type="button" class="remove-img" data-index="${index}" style="position: absolute; top: -5px; right: -5px; background: #000; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; line-height: 20px;">&times;</button>
     </div>
   `).join('');
-}
 
-if (uploadWidgetBtn) uploadWidgetBtn.addEventListener("click", () => myWidget.open(), false);
+  // Listener para eliminar fotos
+  imagePreview.querySelectorAll('.remove-img').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt(btn.dataset.index);
+      uploadedImages.splice(idx, 1);
+      renderPreviews();
+    });
+  });
+}
 
 /* --- Firestore CRUD --- */
 

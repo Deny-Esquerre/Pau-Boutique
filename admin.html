@@ -506,12 +506,16 @@
             </div>
 
             <div class="form-group" style="margin-top: 1.5rem;">
-              <label>Imágenes (Sube 3 imágenes para que el cliente aprecie mejor la pieza)</label>
-              <div id="upload-widget" style="border: 2px dashed #ddd; padding: 2rem; text-align: center; cursor: pointer; border-radius: 8px; transition: all 0.3s;">
-                <i data-lucide="cloud-upload" style="width: 30px; height: 30px; color: #999; margin-bottom: 10px;"></i>
-                <p style="color: #666;">Haz clic para subir hasta 3 imágenes a Cloudinary</p>
-                <div id="image-preview" class="preview-grid">
-                  <!-- JS Injected previews -->
+              <label>Imágenes (Selecciona hasta 3 fotos de tu galería)</label>
+              <div class="native-upload-container" style="margin-top: 10px;">
+                <input type="file" id="p-images-input" multiple accept="image/*" style="display: none;">
+                <label for="p-images-input" style="display: inline-block; background: var(--admin-sidebar-bg); color: white; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">
+                  <i data-lucide="image" style="width: 16px; margin-right: 8px; vertical-align: middle;"></i>
+                  Seleccionar Fotos
+                </label>
+                <p id="upload-status" style="display: inline-block; margin-left: 15px; font-size: 0.8rem; color: var(--admin-accent); font-weight: 500;"></p>
+                <div id="image-preview" class="preview-grid" style="margin-top: 15px;">
+                  <!-- Previews injected by JS -->
                 </div>
               </div>
             </div>
