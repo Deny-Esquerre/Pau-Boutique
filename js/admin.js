@@ -5,6 +5,7 @@
 import { auth, db, CLOUDINARY_CONFIG } from './firebase-config.js';
 import { products as initialProducts } from './modules/data.js';
 import { showToast } from './modules/utils.js';
+import { fetchConfig, updateConfig } from './modules/config.js';
 import { 
   signInWithEmailAndPassword, 
   signOut, 
@@ -31,6 +32,8 @@ const loadingOverlay = document.getElementById('loading-overlay');
 const sidebarToggle = document.getElementById('sidebar-toggle');
 const sidebar = document.querySelector('.sidebar');
 const sidebarOverlay = document.getElementById('sidebar-overlay');
+const configForm = document.getElementById('config-form');
+const configAnnouncementInput = document.getElementById('config-announcement');
 
 // DOM Elements - Form & List
 const productForm = document.getElementById('product-form');
@@ -80,6 +83,10 @@ function switchModule(moduleId) {
   modules.forEach(mod => mod.id === `mod-${moduleId}` ? mod.classList.add('active') : mod.classList.remove('active'));
   sidebarLinks.forEach(link => link.dataset.mod === moduleId ? link.classList.add('active') : link.classList.remove('active'));
   
+  if (moduleId === 'config') {
+    initConfigModule();
+  }
+
   // Close sidebar on mobile after selection
   if (window.innerWidth <= 992) {
     sidebar.classList.remove('active');
@@ -114,6 +121,28 @@ if (sidebarOverlay) {
 quickLinks.forEach(btn => {
   btn.addEventListener('click', () => switchModule(btn.dataset.mod));
 });
+
+/* --- Configuration Module --- */
+
+async function initConfigModule() {
+  const config = await fetchConfig();
+  if (config && configAnnouncementInput) {
+    configAnnouncementInput.value = config.announcement;
+  }
+}
+
+if (configForm) {
+  configForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const newAnnouncement = configAnnouncementInput.value;
+    const success = await updateConfig({ announcement: newAnnouncement });
+    if (success) {
+      showToast("Configuración del sitio actualizada con éxito");
+    } else {
+      showToast("Error al actualizar la configuración", "error");
+    }
+  });
+}
 
 /* --- Dashboard Init --- */
 

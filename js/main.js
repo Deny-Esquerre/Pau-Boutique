@@ -13,12 +13,14 @@ import {
   initScrollAnimations 
 } from './modules/ui.js';
 import { openLoginModal, closeLoginModal, handleAdminLogin } from './modules/auth.js';
+import { applyConfig } from './modules/config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize Modules
   loadStaticImages();
   renderProducts();
+  applyConfig();
   initHeaderScroll();
   initMobileMenu();
   initTestimonials();

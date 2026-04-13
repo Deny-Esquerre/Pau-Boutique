@@ -413,6 +413,10 @@
           <i data-lucide="package" style="width: 18px; margin-right: 10px;"></i>
           <span>Inventario</span>
         </a>
+        <a href="#" class="sidebar__link" data-mod="config">
+          <i data-lucide="settings" style="width: 18px; margin-right: 10px;"></i>
+          <span>Configuración</span>
+        </a>
       </nav>
       <div class="sidebar__footer">
         <button id="logout-btn" class="btn--logout">Cerrar Sesión</button>
@@ -539,6 +543,25 @@
               <!-- JS Injected -->
             </tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- Configuration Module -->
+      <section id="mod-config" class="module-section">
+        <div class="content-header">
+          <h1>Configuración Global</h1>
+          <p>Ajusta los textos y banners de tu sitio web.</p>
+        </div>
+        <div class="admin-card">
+          <h3>Barra de Anuncios</h3>
+          <p style="font-size: 0.85rem; color: #666; margin-bottom: 1.5rem;">Este texto aparecerá en la parte superior de todas las páginas de la boutique.</p>
+          <form id="config-form">
+            <div class="form-group">
+              <label>Texto del Anuncio</label>
+              <textarea id="config-announcement" class="form-control" rows="3" required style="width: 100%; border: 1px solid #ddd; padding: 10px;"></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary" style="width: 100%; margin-top: 2rem;">Actualizar Sitio</button>
+          </form>
         </div>
       </section>
 
