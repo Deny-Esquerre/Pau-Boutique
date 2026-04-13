@@ -737,13 +737,19 @@
 
             <!-- Section: Manage Current -->
             <div class="admin-card" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
-              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #f5f5f5;">
-                <i data-lucide="message-square" style="color: var(--admin-accent); width: 22px;"></i>
-                <h3 style="margin: 0; font-family: var(--font-serif); font-size: 1.5rem;">Gestionar Comentarios Publicados</h3>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #f5f5f5;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <i data-lucide="message-square" style="color: var(--admin-accent); width: 22px;"></i>
+                  <h3 style="margin: 0; font-family: var(--font-serif); font-size: 1.5rem;">Testimonios en la Web</h3>
+                </div>
+                <button id="refresh-testimonials" style="background: none; border: none; cursor: pointer; color: var(--color-gray); display: flex; align-items: center; gap: 5px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;">
+                  <i data-lucide="refresh-cw" style="width: 14px;"></i> Actualizar
+                </button>
               </div>
 
-              <div id="testimonials-admin-list" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+              <div id="testimonials-admin-list" style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
                 <!-- Tarjetas de testimonios inyectadas por JS -->
+                <p style="text-align: center; color: #999; padding: 2rem;">Cargando testimonios de la boutique...</p>
               </div>
             </div>
 
