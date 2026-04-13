@@ -17,7 +17,11 @@ export function loadStaticImages() {
       query: 'fashion editorial dark moody elegant', 
       w: 1600, h: 900 
     },
-    'about-img': { query: 'boutique clothing store interior elegant', w: 800, h: 1000 },
+    'about-img': { 
+      local: 'images/about/nosotros.png',
+      query: 'boutique clothing store interior elegant', 
+      w: 800, h: 1000 
+    },
     'insta-img-1': { query: 'fashion outfit street style woman', w: 600, h: 600 },
     'insta-img-2': { query: 'minimalist fashion flatlay', w: 600, h: 600 },
     'insta-img-3': { query: 'woman fashion portrait neutral tones', w: 600, h: 600 },
