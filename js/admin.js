@@ -46,6 +46,7 @@ let uploadedImages = []; // Array to store multiple URLs
 
 // DOM Elements - Dashboard
 const statTotalProducts = document.getElementById('stat-total-products');
+const statCategories = document.getElementById('stat-categories');
 const quickLinks = document.querySelectorAll('.quick-link');
 const migrateBtn = document.getElementById('migrate-btn');
 
@@ -170,33 +171,43 @@ if (imagesInput) {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
     
+    // Limitar a 3 imágenes en total
     if (uploadedImages.length + files.length > 3) {
       showToast("Máximo 3 imágenes permitidas", "error");
+      imagesInput.value = "";
       return;
     }
 
-    uploadStatus.textContent = "Subiendo fotos...";
+    uploadStatus.textContent = "Preparando imágenes...";
     
     for (const file of files) {
+      // 1. Mostrar previsualización local inmediata (opcional, pero útil para feedback)
+      // 2. Subir a Cloudinary
       const formData = new FormData();
       formData.append('file', file);
       formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
 
       try {
+        uploadStatus.textContent = `Subiendo: ${file.name}...`;
         const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, {
           method: 'POST',
           body: formData
         });
 
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error?.message || "Error en la subida");
+        }
+
         const result = await response.json();
         if (result.secure_url) {
           uploadedImages.push(result.secure_url);
           renderPreviews();
-          showToast("Imagen lista", "success");
+          showToast(`¡${file.name} lista!`, "success");
         }
       } catch (error) {
         console.error("Error al subir a Cloudinary:", error);
-        showToast("Error al subir una imagen", "error");
+        showToast(`No se pudo subir ${file.name}. Verifica tu configuración de Cloudinary.`, "error");
       }
     }
 
@@ -206,20 +217,28 @@ if (imagesInput) {
 }
 
 function renderPreviews() {
-  imagePreview.innerHTML = uploadedImages.map((url, index) => `
-    <div class="preview-item" style="position: relative; display: inline-block; margin-right: 10px;">
-      <img src="${url}" alt="Preview ${index + 1}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
-      <button type="button" class="remove-img" data-index="${index}" style="position: absolute; top: -5px; right: -5px; background: #000; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; line-height: 20px;">&times;</button>
-    </div>
-  `).join('');
+  imagePreview.innerHTML = "";
+  if (uploadedImages.length === 0) {
+    imagePreview.innerHTML = '<p style="font-size: 0.8rem; color: #999;">No hay fotos seleccionadas</p>';
+    return;
+  }
 
-  // Listener para eliminar fotos
-  imagePreview.querySelectorAll('.remove-img').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const idx = parseInt(btn.dataset.index);
-      uploadedImages.splice(idx, 1);
+  uploadedImages.forEach((url, index) => {
+    const item = document.createElement('div');
+    item.className = "preview-item";
+    item.style.position = "relative";
+    item.innerHTML = `
+      <img src="${url}" alt="Preview ${index + 1}">
+      <button type="button" class="remove-img" data-index="${index}">&times;</button>
+    `;
+    
+    item.querySelector('.remove-img').onclick = (e) => {
+      e.preventDefault();
+      uploadedImages.splice(index, 1);
       renderPreviews();
-    });
+    };
+    
+    imagePreview.appendChild(item);
   });
 }
 
@@ -227,28 +246,41 @@ function renderPreviews() {
 
 productForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  if (uploadedImages.length === 0) {
+    if (!confirm("No has subido ninguna imagen. ¿Deseas crear el producto con una imagen por defecto?")) {
+      return;
+    }
+  }
+
   toggleLoading(true);
 
   const productData = {
-    name: document.getElementById('p-name').value,
+    name: document.getElementById('p-name').value.trim(),
     price: parseFloat(document.getElementById('p-price').value),
-    description: document.getElementById('p-desc').value,
+    description: document.getElementById('p-desc').value.trim(),
     category: document.getElementById('p-category').value,
-    badge: document.getElementById('p-badge').value,
-    images: uploadedImages.length > 0 ? uploadedImages : ['https://source.unsplash.com/800x1000/?fashion'],
+    badge: document.getElementById('p-badge').value.trim(),
+    // Usar las imágenes subidas o una por defecto si está vacío
+    images: uploadedImages.length > 0 ? uploadedImages : ['https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'],
     createdAt: new Date()
   };
 
   try {
     await addDoc(collection(db, "products"), productData);
-    showToast("Pieza guardada en la colección con éxito");
+    showToast("¡Pieza añadida con éxito a la boutique!");
+    
+    // Limpiar formulario y estado
     productForm.reset();
     uploadedImages = [];
-    imagePreview.innerHTML = '';
-    loadInventory();
-    switchModule('inventory');
+    renderPreviews();
+    
+    // Actualizar inventario y cambiar de pestaña
+    await loadInventory();
+    setTimeout(() => switchModule('inventory'), 500);
   } catch (error) {
-    showToast("Error: " + error.message, 'error');
+    console.error("Error Firestore:", error);
+    showToast("Error al guardar el producto: " + error.message, 'error');
   } finally {
     toggleLoading(false);
   }
@@ -285,6 +317,11 @@ async function loadInventory() {
     });
 
     statTotalProducts.textContent = count;
+    
+    // Calcular categorías únicas
+    const categories = new Set();
+    querySnapshot.forEach(docSnap => categories.add(docSnap.data().category));
+    if (statCategories) statCategories.textContent = categories.size;
 
     document.querySelectorAll('.btn-delete').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -320,8 +357,14 @@ if (migrateBtn) {
       toggleLoading(true);
       try {
         for (const product of initialProducts) {
-          const { id, ...data } = product;
-          await addDoc(collection(db, "products"), { ...data, createdAt: new Date() });
+          const { id, image, ...data } = product;
+          // Normalizar formato de imágenes (siempre usar arreglo)
+          const productData = {
+            ...data,
+            images: [image],
+            createdAt: new Date()
+          };
+          await addDoc(collection(db, "products"), productData);
         }
         showToast("Migración terminada");
         loadInventory();
