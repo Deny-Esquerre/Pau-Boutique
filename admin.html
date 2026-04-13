@@ -8,7 +8,7 @@
   <!-- Preload Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
   
   <!-- CSS -->
   <link rel="stylesheet" href="css/main.css">
@@ -27,8 +27,8 @@
       background-color: var(--admin-bg);
       font-family: var(--font-sans);
       display: flex;
-      flex-direction: column;
-      height: 100vh; /* Forzado a 100vh para que el scroll funcione en los hijos */
+      flex-direction: row;
+      height: 100vh;
       margin: 0;
       overflow: hidden;
     }
@@ -56,6 +56,8 @@
       display: none; /* Shown after login */
       flex: 1;
       display: flex;
+      height: 100vh;
+      width: 100%;
     }
 
     /* Sidebar */
@@ -68,6 +70,9 @@
       padding: var(--space-md) 0;
       transition: all 0.3s ease;
       z-index: 100;
+      flex-shrink: 0;
+      height: 100vh;
+      overflow-y: auto;
     }
 
     .sidebar__logo {
@@ -79,9 +84,8 @@
     }
 
     .sidebar__logo img {
-      max-height: 80px; /* Aumentado */
+      max-height: 80px;
       width: auto;
-      /* Remove potential transparency issues */
       filter: drop-shadow(0 0 1px rgba(255,255,255,0.1));
     }
 
@@ -110,14 +114,17 @@
     .sidebar__footer {
       padding: var(--space-md);
       border-top: 1px solid rgba(255,255,255,0.1);
-      margin-top: auto; /* Push to bottom */
+      margin-top: auto;
     }
 
     /* Main Content */
     .main-content {
       flex: 1;
+      height: 100vh;
       overflow-y: auto;
-      padding: 2rem var(--space-lg) var(--space-lg); /* Menos padding superior */
+      padding: 3rem var(--space-lg);
+      background: var(--admin-bg);
+      -webkit-overflow-scrolling: touch;
     }
 
     .module-section {
@@ -135,7 +142,7 @@
     }
 
     .content-header {
-      margin-bottom: 1.5rem; /* Reducido de var(--space-lg) */
+      margin-bottom: 2rem;
     }
 
     .content-header h1 {
@@ -219,12 +226,13 @@
 
     /* Responsive Queries */
     @media (max-width: 992px) {
+      body.admin-body { flex-direction: column; }
       .mobile-admin-header { display: flex; }
       
       .admin-wrapper {
         position: relative;
         flex: 1;
-        display: block; /* Cambiado de flex para evitar el "cuadro blanco" del sidebar */
+        display: block;
         overflow: hidden;
       }
 
@@ -233,7 +241,7 @@
         left: 0;
         top: 0;
         bottom: 0;
-        width: 280px; /* Un poco más ancho para mejor legibilidad */
+        width: 280px;
         transform: translateX(-100%);
         z-index: 1000;
         box-shadow: 10px 0 30px rgba(0,0,0,0.1);
@@ -243,52 +251,9 @@
         transform: translateX(0);
       }
 
-      .sidebar__link {
-        padding: 12px 1.5rem; /* Ajustado para móviles */
-      }
-
       .main-content {
-        padding: 1.5rem 1rem 4rem; /* Aumentado padding inferior para scroll */
-      }
-
-      /* Stacking forms and grids */
-      #product-form > div {
-        grid-template-columns: 1fr !important;
-        gap: 1rem;
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .admin-card {
-        padding: 1.2rem;
-      }
-
-      /* Compact form for mobile */
-      #product-form {
-        margin-top: 1rem !important;
-      }
-      
-      #product-form .form-group {
-        margin-top: 0.8rem !important;
-      }
-
-      /* Table Adjustments */
-      .admin-card table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .content-header h1 {
-        font-size: 1.5rem;
+        padding: 1.5rem 1rem 4rem;
+        height: calc(100vh - 50px);
       }
     }
 
@@ -325,7 +290,7 @@
       background: var(--color-warm-white);
       border: 1px solid #eee;
       padding: 6px 14px;
-      border-radius: 0; /* Rectos como la web */
+      border-radius: 0;
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -338,51 +303,6 @@
     .cat-chip:hover {
       border-color: var(--admin-accent);
       background: var(--color-cream);
-    }
-
-    /* Multi-image preview */
-    .preview-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .preview-item {
-      position: relative;
-      aspect-ratio: 1/1;
-      background: #eee;
-      border-radius: 8px;
-      overflow: visible;
-      border: 1px solid #eee;
-    }
-    .preview-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    .remove-img {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      background: #ff4d4d;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      z-index: 10;
-      transition: transform 0.2s;
-    }
-    .remove-img:hover {
-      transform: scale(1.1);
-      background: #ff0000;
     }
 
     /* Dropzone Style - Pau Boutique Aesthetic */
@@ -492,6 +412,51 @@
       justify-content: center;
       display: none;
     }
+
+    /* Multi-image preview */
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .preview-item {
+      position: relative;
+      aspect-ratio: 1/1;
+      background: #eee;
+      border-radius: 8px;
+      overflow: visible;
+      border: 1px solid #eee;
+    }
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .remove-img {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 10;
+      transition: transform 0.2s;
+    }
+    .remove-img:hover {
+      transform: scale(1.1);
+      background: #ff0000;
+    }
   </style>
 </head>
 <body class="admin-body">
@@ -578,7 +543,7 @@
           </div>
           <div class="stat-card">
             <p class="stat-card__label">Categorías</p>
-            <p class="stat-card__value" id="stat-categories">3</p>
+            <p class="stat-card__value" id="stat-categories">0</p>
           </div>
           <div class="stat-card">
             <p class="stat-card__label">Imágenes Cloudinary</p>
