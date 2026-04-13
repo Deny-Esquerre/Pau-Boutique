@@ -30,6 +30,7 @@ const modules = document.querySelectorAll('.module-section');
 const loadingOverlay = document.getElementById('loading-overlay');
 const sidebarToggle = document.getElementById('sidebar-toggle');
 const sidebar = document.querySelector('.sidebar');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
 
 // DOM Elements - Form & List
 const productForm = document.getElementById('product-form');
@@ -82,6 +83,7 @@ function switchModule(moduleId) {
   // Close sidebar on mobile after selection
   if (window.innerWidth <= 992) {
     sidebar.classList.remove('active');
+    if (sidebarOverlay) sidebarOverlay.classList.remove('active');
   }
 }
 
@@ -94,7 +96,18 @@ sidebarLinks.forEach(link => {
 
 if (sidebarToggle) {
   sidebarToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
+    const isActive = sidebar.classList.toggle('active');
+    if (sidebarOverlay) {
+      if (isActive) sidebarOverlay.classList.add('active');
+      else sidebarOverlay.classList.remove('active');
+    }
+  });
+}
+
+if (sidebarOverlay) {
+  sidebarOverlay.addEventListener('click', () => {
+    sidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
   });
 }
 

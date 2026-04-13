@@ -27,8 +27,8 @@
       background-color: var(--admin-bg);
       font-family: var(--font-sans);
       display: flex;
-      flex-direction: column; /* Cambiado para soportar mobile header */
-      min-height: 100vh;
+      flex-direction: column;
+      height: 100vh; /* Forzado a 100vh para que el scroll funcione en los hijos */
       margin: 0;
       overflow: hidden;
     }
@@ -203,12 +203,28 @@
       align-items: center;
     }
 
+    /* Sidebar Overlay (Backdrop) */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
     /* Responsive Queries */
     @media (max-width: 992px) {
       .mobile-admin-header { display: flex; }
       
       .admin-wrapper {
         position: relative;
+        flex: 1;
+        display: block; /* Cambiado de flex para evitar el "cuadro blanco" del sidebar */
         overflow: hidden;
       }
 
@@ -217,16 +233,22 @@
         left: 0;
         top: 0;
         bottom: 0;
+        width: 280px; /* Un poco más ancho para mejor legibilidad */
         transform: translateX(-100%);
         z-index: 1000;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.1);
       }
 
       .sidebar.active {
         transform: translateX(0);
       }
 
+      .sidebar__link {
+        padding: 12px 1.5rem; /* Ajustado para móviles */
+      }
+
       .main-content {
-        padding: 1.5rem;
+        padding: 1.5rem 1rem 4rem; /* Aumentado padding inferior para scroll */
       }
 
       /* Stacking forms and grids */
@@ -240,7 +262,16 @@
       }
       
       .admin-card {
-        padding: 1.5rem;
+        padding: 1.2rem;
+      }
+
+      /* Compact form for mobile */
+      #product-form {
+        margin-top: 1rem !important;
+      }
+      
+      #product-form .form-group {
+        margin-top: 0.8rem !important;
       }
 
       /* Table Adjustments */
@@ -360,6 +391,8 @@
       <i data-lucide="menu"></i>
     </button>
   </header>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <div class="admin-wrapper" id="admin-wrapper">
     
