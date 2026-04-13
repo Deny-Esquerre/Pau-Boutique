@@ -97,6 +97,29 @@ function switchModule(moduleId) {
   }
 }
 
+// Sub-navigation for Config
+const configNavBtns = document.querySelectorAll('.config-nav-btn');
+const subModules = document.querySelectorAll('.sub-module');
+
+configNavBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const subId = btn.dataset.sub;
+    
+    // Update buttons
+    configNavBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    // Update sub-modules
+    subModules.forEach(mod => {
+      if (mod.id === `sub-mod-${subId}`) {
+        mod.classList.add('active');
+      } else {
+        mod.classList.remove('active');
+      }
+    });
+  });
+});
+
 sidebarLinks.forEach(link => {
   link.addEventListener('click', (e) => {
     e.preventDefault();
@@ -135,6 +158,93 @@ async function initConfigModule() {
       configAnnouncementPreview.textContent = config.announcement;
     }
   }
+  loadTestimonialsAdmin();
+}
+
+async function loadTestimonialsAdmin() {
+  if (!testimonialsListAdmin) return;
+  testimonialsListAdmin.innerHTML = '<p style="padding: 20px; text-align: center; color: #999; font-size: 0.8rem;">Actualizando testimonios...</p>';
+  
+  try {
+    const q = query(collection(db, "testimonials"), orderBy("createdAt", "desc"));
+    const querySnapshot = await getDocs(q);
+    testimonialsListAdmin.innerHTML = '';
+
+    if (querySnapshot.empty) {
+      testimonialsListAdmin.innerHTML = '<p style="padding: 20px; text-align: center; color: #999; font-size: 0.8rem;">No hay testimonios publicados.</p>';
+      return;
+    }
+
+    querySnapshot.forEach((docSnap) => {
+      const t = docSnap.data();
+      const item = document.createElement('div');
+      item.style.padding = "15px 0";
+      item.style.borderBottom = "1px solid #f5f5f5";
+      item.style.display = "flex";
+      item.style.justifyContent = "space-between";
+      item.style.alignItems = "center";
+      item.innerHTML = `
+        <div style="padding-right: 20px;">
+          <p style="margin: 0; font-size: 0.85rem; color: var(--color-black); line-height: 1.4; font-style: italic;">"${t.quote}"</p>
+          <span style="font-size: 0.7rem; color: var(--admin-accent); text-transform: uppercase; font-weight: 500; letter-spacing: 0.05em;">— ${t.author}</span>
+        </div>
+        <button class="btn-delete-t" data-id="${docSnap.id}" style="background: none; border: none; color: #d9534f; cursor: pointer; padding: 5px;" title="Eliminar">
+          <i data-lucide="trash-2" style="width: 16px;"></i>
+        </button>
+      `;
+      testimonialsListAdmin.appendChild(item);
+    });
+    
+    // Refresh icons
+    lucide.createIcons();
+
+    // Delete listener
+    document.querySelectorAll('.btn-delete-t').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (confirm("¿Eliminar este testimonio permanentemente?")) {
+          toggleLoading(true);
+          try {
+            await deleteDoc(doc(db, "testimonials", btn.dataset.id));
+            showToast("Testimonio eliminado con éxito");
+            loadTestimonialsAdmin();
+          } catch (error) {
+            showToast("Error al eliminar: " + error.message, "error");
+          } finally {
+            toggleLoading(false);
+          }
+        }
+      });
+    });
+
+  } catch (error) {
+    console.error("Error Firestore Testimonios:", error);
+    testimonialsListAdmin.innerHTML = '<p style="padding: 20px; color: #d9534f; font-size: 0.8rem;">Error al cargar testimonios.</p>';
+  }
+}
+
+if (testimonialForm) {
+  testimonialForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    toggleLoading(true);
+
+    const author = document.getElementById('t-author').value.trim();
+    const quote = document.getElementById('t-quote').value.trim();
+
+    try {
+      await addDoc(collection(db, "testimonials"), {
+        author,
+        quote,
+        createdAt: new Date()
+      });
+      showToast("¡Nuevo testimonio publicado correctamente!");
+      testimonialForm.reset();
+      loadTestimonialsAdmin();
+    } catch (error) {
+      showToast("Error al publicar: " + error.message, "error");
+    } finally {
+      toggleLoading(false);
+    }
+  });
 }
 
 if (configAnnouncementInput) {
