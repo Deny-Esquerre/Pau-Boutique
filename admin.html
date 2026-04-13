@@ -292,35 +292,52 @@
       }
     }
 
-    /* Toast Notifications */
-    .toast-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 3000;
-    }
-
+    /* Toast Notifications - Pau Boutique Style */
     .toast {
       background: white;
       color: var(--color-black);
-      padding: 12px 24px;
-      border-radius: 4px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      margin-bottom: 10px;
-      border-left: 4px solid var(--admin-accent);
+      padding: 16px 28px;
+      border-radius: 2px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+      margin-bottom: 12px;
+      border-left: 3px solid var(--admin-accent);
       display: flex;
       align-items: center;
-      gap: 10px;
-      animation: slideIn 0.3s ease-out;
-      font-size: 0.9rem;
+      gap: 15px;
+      animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      min-width: 300px;
     }
 
-    .toast--success { border-left-color: #28a745; }
-    .toast--error { border-left-color: #dc3545; }
+    .toast--success { border-left-color: #c4a484; } /* Beige dorado */
+    .toast--error { border-left-color: #d9534f; }
 
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Category Chips Style */
+    .cat-chip {
+      background: var(--color-warm-white);
+      border: 1px solid #eee;
+      padding: 6px 14px;
+      border-radius: 0; /* Rectos como la web */
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s;
+    }
+
+    .cat-chip:hover {
+      border-color: var(--admin-accent);
+      background: var(--color-cream);
     }
 
     /* Multi-image preview */
@@ -613,16 +630,36 @@
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
               <div class="form-group">
-                <label>Categoría</label>
-                <select id="p-category" class="form-control" style="width: 100%; border: 1px solid #ddd; padding: 10px;">
-                  <option value="vestidos">Vestidos</option>
-                  <option value="abrigos">Abrigos</option>
-                  <option value="accesorios">Accesorios</option>
-                </select>
+                <label style="font-size: 0.7rem; color: var(--color-gray); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 8px;">Categoría</label>
+                <div style="display: flex; gap: 10px;">
+                  <select id="p-category" class="form-control" style="flex: 1; border: 1px solid #eee; padding: 12px; border-radius: 0; background: var(--color-warm-white); font-family: var(--font-sans);">
+                    <!-- Injected by JS -->
+                  </select>
+                  <button type="button" id="manage-cats-btn" style="background: var(--admin-sidebar-bg); color: white; border: none; padding: 0 15px; cursor: pointer; border-radius: 2px;" title="Gestionar Categorías">
+                    <i data-lucide="plus" style="width: 16px;"></i>
+                  </button>
+                </div>
               </div>
               <div class="form-group">
-                <label>Etiqueta (Opcional)</label>
-                <input type="text" id="p-badge" class="form-control" placeholder="Ej: Nuevo" style="width: 100%; border: 1px solid #ddd; padding: 10px;">
+                <label style="font-size: 0.7rem; color: var(--color-gray); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 8px;">Etiqueta (Opcional)</label>
+                <input type="text" id="p-badge" class="form-control" placeholder="Ej: Nuevo" style="width: 100%; border: 1px solid #eee; padding: 12px; border-radius: 0; background: var(--color-warm-white); font-family: var(--font-sans);">
+              </div>
+            </div>
+
+            <!-- Modal / Sub-form for Categories (Initially Hidden) -->
+            <div id="cat-manager-panel" style="display: none; margin-top: 1.5rem; padding: 1.5rem; border: 1px solid var(--admin-accent); background: var(--color-cream); border-radius: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h4 style="margin: 0; font-family: var(--font-serif); font-size: 1.1rem; color: var(--color-black);">Gestionar Mis Categorías</h4>
+                <button type="button" id="close-cat-manager" style="background: none; border: none; cursor: pointer; font-size: 1.5rem;">&times;</button>
+              </div>
+              
+              <div id="cat-list-admin" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1.5rem;">
+                <!-- Chips de categorías con botón X -->
+              </div>
+
+              <div style="display: flex; gap: 10px;">
+                <input type="text" id="new-cat-name" placeholder="Nueva categoría..." style="flex: 1; border: 1px solid #ddd; padding: 8px 12px; font-family: var(--font-sans); border-radius: 2px;">
+                <button type="button" id="save-new-cat" class="btn btn--primary" style="padding: 8px 20px; font-size: 0.8rem;">Añadir</button>
               </div>
             </div>
 

@@ -45,11 +45,110 @@ const refreshTBtn = document.getElementById('refresh-testimonials');
 // DOM Elements - Form & List (Products)
 const productForm = document.getElementById('product-form');
 const inventoryList = document.getElementById('inventory-list');
+const pCategorySelect = document.getElementById('p-category');
+const manageCatsBtn = document.getElementById('manage-cats-btn');
+const catManagerPanel = document.getElementById('cat-manager-panel');
+const closeCatManager = document.getElementById('close-cat-manager');
+const catListAdmin = document.getElementById('cat-list-admin');
+const newCatInput = document.getElementById('new-cat-name');
+const saveCatBtn = document.getElementById('save-new-cat');
 const imagesInput = document.getElementById('p-images-input');
 const dropzone = document.getElementById('dropzone');
 const uploadStatus = document.getElementById('upload-status');
 const imagePreview = document.getElementById('image-preview');
 let uploadedImages = []; // Array to store multiple URLs
+
+/* --- Categories Management Logic --- */
+
+async function loadCategories() {
+  if (!pCategorySelect || !catListAdmin) return;
+  
+  try {
+    const q = query(collection(db, "categories"), orderBy("name", "asc"));
+    const querySnapshot = await getDocs(q);
+    
+    // Si no hay categorías, crear las básicas
+    if (querySnapshot.empty) {
+      const defaults = ["Vestidos", "Abrigos", "Accesorios"];
+      for (const cat of defaults) {
+        await addDoc(collection(db, "categories"), { name: cat });
+      }
+      return loadCategories(); // Recargar una vez creadas
+    }
+
+    // Actualizar Selector de Producto
+    pCategorySelect.innerHTML = '';
+    catListAdmin.innerHTML = '';
+
+    querySnapshot.forEach((docSnap) => {
+      const cat = docSnap.data();
+      const catId = docSnap.id;
+      
+      // Añadir al selector
+      const option = document.createElement('option');
+      option.value = cat.name.toLowerCase();
+      option.textContent = cat.name;
+      pCategorySelect.appendChild(option);
+
+      // Añadir al gestor (Chips)
+      const chip = document.createElement('div');
+      chip.className = "cat-chip";
+      chip.innerHTML = `
+        <span>${cat.name}</span>
+        <button type="button" class="del-cat" data-id="${catId}" style="background: none; border: none; color: #d9534f; cursor: pointer; font-size: 14px; line-height: 1; padding: 0;">&times;</button>
+      `;
+      catListAdmin.appendChild(chip);
+    });
+
+    // Listener para eliminar categorías
+    document.querySelectorAll('.del-cat').forEach(btn => {
+      btn.onclick = async () => {
+        if (confirm("¿Eliminar esta categoría de la lista?")) {
+          toggleLoading(true);
+          try {
+            await deleteDoc(doc(db, "categories", btn.dataset.id));
+            showToast("Categoría eliminada");
+            loadCategories();
+          } catch (error) {
+            showToast("Error: " + error.message, "error");
+          } finally {
+            toggleLoading(false);
+          }
+        }
+      };
+    });
+
+  } catch (error) {
+    console.error("Error cargando categorías:", error);
+  }
+}
+
+// UI Handlers for Categories
+if (manageCatsBtn) {
+  manageCatsBtn.onclick = () => catManagerPanel.style.display = 'block';
+}
+if (closeCatManager) {
+  closeCatManager.onclick = () => catManagerPanel.style.display = 'none';
+}
+
+if (saveCatBtn) {
+  saveCatBtn.onclick = async () => {
+    const name = newCatInput.value.trim();
+    if (!name) return;
+    
+    toggleLoading(true);
+    try {
+      await addDoc(collection(db, "categories"), { name: name });
+      newCatInput.value = '';
+      showToast("¡Categoría añadida!");
+      loadCategories();
+    } catch (error) {
+      showToast("Error: " + error.message, "error");
+    } finally {
+      toggleLoading(false);
+    }
+  };
+}
 
 // DOM Elements - Dashboard
 const statTotalProducts = document.getElementById('stat-total-products');
@@ -366,6 +465,7 @@ if (refreshTBtn) {
 
 async function initDashboard() {
   await loadInventory();
+  await loadCategories();
 }
 
 /* --- Drag & Drop para el Dropzone --- */
