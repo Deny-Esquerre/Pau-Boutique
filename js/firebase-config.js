@@ -25,6 +25,6 @@ export const db = getFirestore(app);
 
 // Cloudinary Constants (For future use in Admin Dashboard)
 export const CLOUDINARY_CONFIG = {
-  cloudName: 'PauBoutique',
-  uploadPreset: 'Unsigned' 
+  cloudName: 'dr0jx9s0y',
+  uploadPreset: 'PauBoutique' 
 };
