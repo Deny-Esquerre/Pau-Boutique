@@ -368,6 +368,55 @@
       background: #ff0000;
     }
 
+    /* Dropzone Style - Pau Boutique Aesthetic */
+    .upload-dropzone {
+      border: 1px dashed var(--admin-accent);
+      border-radius: 4px;
+      padding: 50px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      background: var(--color-warm-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .upload-dropzone:hover, .upload-dropzone.dragover {
+      background: var(--color-cream);
+      border-style: solid;
+      border-color: var(--admin-accent);
+    }
+
+    .upload-dropzone i {
+      color: var(--admin-accent);
+      opacity: 0.7;
+      transition: transform 0.3s ease;
+    }
+
+    .upload-dropzone:hover i {
+      transform: translateY(-5px);
+      opacity: 1;
+    }
+
+    .upload-dropzone p {
+      margin: 0;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-black);
+    }
+
+    .upload-dropzone span {
+      font-size: 0.75rem;
+      color: var(--color-gray);
+      font-style: italic;
+    }
+
     #loading-overlay {
       position: fixed;
       inset: 0;
