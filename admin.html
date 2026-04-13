@@ -555,12 +555,18 @@
         <div class="admin-card">
           <h3>Barra de Anuncios</h3>
           <p style="font-size: 0.85rem; color: #666; margin-bottom: 1.5rem;">Este texto aparecerá en la parte superior de todas las páginas de la boutique.</p>
+          
+          <!-- Live Preview -->
+          <div style="background: var(--admin-sidebar-bg); color: white; padding: 10px; text-align: center; margin-bottom: 2rem; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;">
+            <span id="announcement-preview">CARGANDO...</span>
+          </div>
+
           <form id="config-form">
             <div class="form-group">
-              <label>Texto del Anuncio</label>
+              <label>Modificar Texto del Anuncio</label>
               <textarea id="config-announcement" class="form-control" rows="3" required style="width: 100%; border: 1px solid #ddd; padding: 10px;"></textarea>
             </div>
-            <button type="submit" class="btn btn--primary" style="width: 100%; margin-top: 2rem;">Actualizar Sitio</button>
+            <button type="submit" class="btn btn--primary" style="width: 100%; margin-top: 2rem;">Guardar y Actualizar Sitio</button>
           </form>
         </div>
       </section>

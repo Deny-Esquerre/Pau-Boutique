@@ -34,6 +34,7 @@ const sidebar = document.querySelector('.sidebar');
 const sidebarOverlay = document.getElementById('sidebar-overlay');
 const configForm = document.getElementById('config-form');
 const configAnnouncementInput = document.getElementById('config-announcement');
+const configAnnouncementPreview = document.getElementById('announcement-preview');
 
 // DOM Elements - Form & List
 const productForm = document.getElementById('product-form');
@@ -128,7 +129,18 @@ async function initConfigModule() {
   const config = await fetchConfig();
   if (config && configAnnouncementInput) {
     configAnnouncementInput.value = config.announcement;
+    if (configAnnouncementPreview) {
+      configAnnouncementPreview.textContent = config.announcement;
+    }
   }
+}
+
+if (configAnnouncementInput) {
+  configAnnouncementInput.addEventListener('input', (e) => {
+    if (configAnnouncementPreview) {
+      configAnnouncementPreview.textContent = e.target.value;
+    }
+  });
 }
 
 if (configForm) {
