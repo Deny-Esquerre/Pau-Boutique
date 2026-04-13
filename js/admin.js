@@ -6,6 +6,7 @@ import { auth, db, CLOUDINARY_CONFIG } from './firebase-config.js';
 import { products as initialProducts } from './modules/data.js';
 import { 
   signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
   signOut, 
   onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
@@ -31,6 +32,7 @@ const uploadWidgetBtn = document.getElementById('upload-widget');
 const imagePreview = document.getElementById('image-preview');
 const pImageUrlInput = document.getElementById('p-image-url');
 const loadingOverlay = document.getElementById('loading-overlay');
+const tempRegisterBtn = document.getElementById('temp-register');
 
 /* --- Authentication --- */
 
@@ -59,6 +61,32 @@ loginForm.addEventListener('submit', async (e) => {
     toggleLoading(false);
   }
 });
+
+// Temporary Register (Only for first-time setup)
+if (tempRegisterBtn) {
+  tempRegisterBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const pass = document.getElementById('login-password').value;
+
+    if (!email || !pass) {
+      alert("Por favor, ingresa los datos en el formulario antes de registrarte.");
+      return;
+    }
+
+    if (confirm("¿Deseas crear esta cuenta como administradora? Úsalo solo una vez.")) {
+      toggleLoading(true);
+      try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+        alert("Cuenta creada con éxito. Ahora puedes gestionar tu boutique.");
+      } catch (error) {
+        alert("Error al crear cuenta: " + error.message);
+      } finally {
+        toggleLoading(false);
+      }
+    }
+  });
+}
 
 // Logout
 logoutBtn.addEventListener('click', () => signOut(auth));
