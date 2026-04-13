@@ -178,20 +178,38 @@ async function loadTestimonialsAdmin() {
     querySnapshot.forEach((docSnap) => {
       const t = docSnap.data();
       const item = document.createElement('div');
-      item.style.padding = "15px 0";
-      item.style.borderBottom = "1px solid #f5f5f5";
+      item.style.background = "var(--color-warm-white)";
+      item.style.padding = "20px";
+      item.style.borderRadius = "6px";
+      item.style.border = "1px solid #f0f0f0";
       item.style.display = "flex";
-      item.style.justifyContent = "space-between";
-      item.style.alignItems = "center";
+      item.style.flexDirection = "column";
+      item.style.gap = "12px";
+      item.style.position = "relative";
+      item.style.transition = "transform 0.2s, box-shadow 0.2s";
+      
       item.innerHTML = `
-        <div style="padding-right: 20px;">
-          <p style="margin: 0; font-size: 0.85rem; color: var(--color-black); line-height: 1.4; font-style: italic;">"${t.quote}"</p>
-          <span style="font-size: 0.7rem; color: var(--admin-accent); text-transform: uppercase; font-weight: 500; letter-spacing: 0.05em;">— ${t.author}</span>
+        <div style="padding-right: 40px;">
+          <p style="margin: 0; font-size: 0.95rem; color: var(--color-black); line-height: 1.5; font-style: italic;">"${t.quote}"</p>
+          <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 20px; height: 1px; background: var(--admin-accent);"></div>
+            <span style="font-size: 0.75rem; color: var(--admin-accent); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">— ${t.author}</span>
+          </div>
         </div>
-        <button class="btn-delete-t" data-id="${docSnap.id}" style="background: none; border: none; color: #d9534f; cursor: pointer; padding: 5px;" title="Eliminar">
-          <i data-lucide="trash-2" style="width: 16px;"></i>
+        <button class="btn-delete-t" data-id="${docSnap.id}" style="position: absolute; top: 15px; right: 15px; background: white; border: 1px solid #eee; color: #d9534f; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s;" title="Eliminar Testimonio">
+          <i data-lucide="trash-2" style="width: 14px;"></i>
         </button>
       `;
+
+      item.onmouseenter = () => {
+        item.style.transform = "translateY(-2px)";
+        item.style.boxShadow = "0 5px 15px rgba(0,0,0,0.03)";
+      };
+      item.onmouseleave = () => {
+        item.style.transform = "translateY(0)";
+        item.style.boxShadow = "none";
+      };
+
       testimonialsListAdmin.appendChild(item);
     });
     

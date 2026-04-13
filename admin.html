@@ -709,30 +709,42 @@
 
         <!-- Sub-module: Testimonials -->
         <div id="sub-mod-testimonials" class="sub-module">
-          <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem;">
+          <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 900px; margin: 0 auto;">
             
-            <!-- List -->
-            <div class="admin-card" style="background: white; padding: 2rem; border-radius: 8px;">
-              <h3 style="margin-top: 0; font-family: var(--font-serif); margin-bottom: 1.5rem;">Testimonios Publicados</h3>
-              <div id="testimonials-admin-list" style="border-top: 1px solid #f5f5f5;">
-                <!-- Injected by JS -->
+            <!-- Section: Add New -->
+            <div class="admin-card" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 2rem;">
+                <div style="background: var(--admin-accent); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                  <i data-lucide="plus" style="width: 18px;"></i>
+                </div>
+                <h3 style="margin: 0; font-family: var(--font-serif); font-size: 1.5rem;">Añadir Nuevo Testimonio</h3>
               </div>
+
+              <form id="testimonial-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group" style="grid-column: span 2;">
+                  <label style="font-size: 0.7rem; color: var(--color-gray); text-transform: uppercase; letter-spacing: 0.05em;">Nombre de la Clienta</label>
+                  <input type="text" id="t-author" class="form-control" placeholder="Ej: Carolina Sanín" required style="width: 100%; border: 1px solid #eee; padding: 12px; border-radius: 4px; margin-top: 8px; background: var(--color-warm-white);">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                  <label style="font-size: 0.7rem; color: var(--color-gray); text-transform: uppercase; letter-spacing: 0.05em;">Cita o Comentario</label>
+                  <textarea id="t-quote" class="form-control" rows="3" placeholder="Escribe el testimonio aquí..." required style="width: 100%; border: 1px solid #eee; padding: 12px; border-radius: 4px; margin-top: 8px; background: var(--color-warm-white); font-style: italic;"></textarea>
+                </div>
+                <div style="grid-column: span 2; display: flex; justify-content: flex-end;">
+                  <button type="submit" class="btn btn--primary" style="padding: 12px 40px; min-width: 200px;">Publicar Testimonio</button>
+                </div>
+              </form>
             </div>
 
-            <!-- Form -->
-            <div class="admin-card" style="background: white; padding: 2rem; border-radius: 8px;">
-              <h3 style="margin-top: 0; font-family: var(--font-serif); margin-bottom: 1.5rem;">Nuevo Comentario</h3>
-              <form id="testimonial-form">
-                <div class="form-group" style="margin-bottom: 1rem;">
-                  <label style="font-size: 0.7rem; color: var(--color-gray); text-transform: uppercase;">Nombre Clienta</label>
-                  <input type="text" id="t-author" class="form-control" required style="width: 100%; border: 1px solid #ddd; padding: 10px; border-radius: 4px; margin-top: 5px;">
-                </div>
-                <div class="form-group">
-                  <label style="font-size: 0.7rem; color: var(--color-gray); text-transform: uppercase;">Cita / Texto</label>
-                  <textarea id="t-quote" class="form-control" rows="4" required style="width: 100%; border: 1px solid #ddd; padding: 10px; border-radius: 4px; margin-top: 5px;"></textarea>
-                </div>
-                <button type="submit" class="btn btn--outline-dark" style="width: 100%; margin-top: 1.5rem;">Publicar Testimonio</button>
-              </form>
+            <!-- Section: Manage Current -->
+            <div class="admin-card" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #f5f5f5;">
+                <i data-lucide="message-square" style="color: var(--admin-accent); width: 22px;"></i>
+                <h3 style="margin: 0; font-family: var(--font-serif); font-size: 1.5rem;">Gestionar Comentarios Publicados</h3>
+              </div>
+
+              <div id="testimonials-admin-list" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+                <!-- Tarjetas de testimonios inyectadas por JS -->
+              </div>
             </div>
 
           </div>
