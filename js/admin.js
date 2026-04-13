@@ -184,7 +184,11 @@ loginForm.addEventListener('submit', async (e) => {
   }
 });
 
-logoutBtn.addEventListener('click', () => signOut(auth));
+logoutBtn.addEventListener('click', () => {
+  signOut(auth).then(() => {
+    window.location.href = 'index.html';
+  });
+});
 
 /* --- Navigation --- */
 
