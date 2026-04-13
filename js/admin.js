@@ -167,8 +167,28 @@ async function initDashboard() {
 const myWidget = cloudinary.createUploadWidget({
   cloudName: CLOUDINARY_CONFIG.cloudName, 
   uploadPreset: CLOUDINARY_CONFIG.uploadPreset,
+  sources: ['local', 'camera'], // Solo archivos locales y cámara
+  language: 'es', // Idioma español
+  clientAllowedFormats: ['png', 'jpeg', 'jpg', 'webp'],
   multiple: true,
-  maxFiles: 3
+  maxFiles: 3,
+  styles: {
+    palette: {
+      window: "#FFFFFF",
+      sourceBg: "#F4F4F5",
+      windowBorder: "#90A0B3",
+      tabIcon: "#000000",
+      inactiveTabIcon: "#6E706E",
+      menuIcons: "#000000",
+      link: "#C4A484",
+      action: "#000000",
+      inProgress: "#C4A484",
+      complete: "#20B832",
+      error: "#E03C31",
+      textDark: "#000000",
+      textLight: "#FFFFFF"
+    }
+  }
 }, (error, result) => { 
   if (!error && result && result.event === "success") { 
     uploadedImages.push(result.info.secure_url);
