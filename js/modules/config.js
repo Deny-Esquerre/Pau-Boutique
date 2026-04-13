@@ -32,7 +32,7 @@ export async function updateConfig(data) {
     return true;
   } catch (error) {
     console.error("Error updating config:", error);
-    return false;
+    throw error; // Lanzar el error para que admin.js lo capture y muestre
   }
 }
 
