@@ -15,80 +15,38 @@ export function initMobileMenu() {
       toggle.classList.toggle('active');
       mobileNav.classList.toggle('open');
     });
-  import { db } from '../firebase-config.js';
-  import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-
-  /* --- UI Effects --- */
-  ...
-  export async function initTestimonials() {
-    const container = document.getElementById('testimonials-carousel');
-    const dotsContainer = document.getElementById('testimonial-dots');
-
-    if (!container || !dotsContainer) return;
-
-    try {
-      const q = query(collection(db, "testimonials"), orderBy("createdAt", "desc"));
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        container.innerHTML = '<p style="text-align: center; color: var(--color-gray); font-style: italic;">Próximamente más experiencias...</p>';
-        return;
-      }
-
-      container.innerHTML = '';
-      dotsContainer.innerHTML = '';
-
-      let index = 0;
-      querySnapshot.forEach((docSnap) => {
-        const t = docSnap.data();
-        const isActive = index === 0;
-
-        // Render Testimonial
-        const testimonialEl = document.createElement('div');
-        testimonialEl.className = `testimonial${isActive ? ' active' : ''}`;
-        testimonialEl.innerHTML = `
-          <p class="testimonial__quote">"${t.quote}"</p>
-          <span class="testimonial__author">— ${t.author}</span>
-        `;
-        container.appendChild(testimonialEl);
-
-        // Render Dot
-        const dot = document.createElement('button');
-        dot.className = `testimonials__dot${isActive ? ' active' : ''}`;
-        dot.setAttribute('aria-label', `Testimonio ${index + 1}`);
-        const currentIndex = index; // Capture for closure
-        dot.addEventListener('click', () => goToSlide(currentIndex));
-        dotsContainer.appendChild(dot);
-
-        index++;
-      });
-
-      const testimonials = container.querySelectorAll('.testimonial');
-      const dots = dotsContainer.querySelectorAll('.testimonials__dot');
-      let current = 0;
-
-      function goToSlide(newIndex) {
-        if (testimonials[current]) testimonials[current].classList.remove('active');
-        if (dots[current]) dots[current].classList.remove('active');
-
-        current = newIndex;
-
-        if (testimonials[current]) testimonials[current].classList.add('active');
-        if (dots[current]) dots[current].classList.add('active');
-      }
-
-      if (testimonials.length > 1) {
-        setInterval(() => {
-          goToSlide((current + 1) % testimonials.length);
-        }, 6000);
-      }
-
-    } catch (error) {
-      console.error("Error loading testimonials:", error);
-      container.innerHTML = '<p style="text-align: center; color: #d9534f;">No se pudieron cargar los testimonios.</p>';
-    }
   }
-  ...
+}
+
+export function initTestimonials() {
+  const testimonials = document.querySelectorAll('.testimonial');
+  const dotsContainer = document.getElementById('testimonial-dots');
+  
+  if (!testimonials.length || !dotsContainer) return;
+
+  testimonials.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = `testimonials__dot${i === 0 ? ' active' : ''}`;
+    dot.setAttribute('aria-label', `Testimonio ${i + 1}`);
+    dot.addEventListener('click', () => goToSlide(i));
+    dotsContainer.appendChild(dot);
+  });
+
+  let current = 0;
+  const dots = dotsContainer.querySelectorAll('.testimonials__dot');
+
+  function goToSlide(index) {
+    testimonials[current]?.classList.remove('active');
+    dots[current]?.classList.remove('active');
+    current = index;
+    testimonials[current]?.classList.add('active');
+    dots[current]?.classList.add('active');
+  }
+
+  setInterval(() => {
+    goToSlide((current + 1) % testimonials.length);
+  }, 5000);
+}
 
 export function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
