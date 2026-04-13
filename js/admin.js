@@ -148,12 +148,36 @@ if (configAnnouncementInput) {
 if (configForm) {
   configForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const newAnnouncement = configAnnouncementInput.value;
-    const success = await updateConfig({ announcement: newAnnouncement });
-    if (success) {
-      showToast("Configuración del sitio actualizada con éxito");
-    } else {
-      showToast("Error al actualizar la configuración", "error");
+    toggleLoading(true);
+    
+    const newAnnouncement = configAnnouncementInput.value.trim();
+    
+    if (!newAnnouncement) {
+      showToast("El texto del anuncio no puede estar vacío", "error");
+      toggleLoading(false);
+      return;
+    }
+
+    try {
+      const success = await updateConfig({ 
+        announcement: newAnnouncement,
+        updatedAt: new Date()
+      });
+      
+      if (success) {
+        showToast("¡Barra de anuncios actualizada con éxito!");
+        // Actualizar la previsualización local también
+        if (configAnnouncementPreview) {
+          configAnnouncementPreview.textContent = newAnnouncement;
+        }
+      } else {
+        throw new Error("La base de datos rechazó la actualización");
+      }
+    } catch (error) {
+      console.error("Error al actualizar configuración:", error);
+      showToast("Error: No se pudo actualizar. Verifica tu conexión.", "error");
+    } finally {
+      toggleLoading(false);
     }
   });
 }
