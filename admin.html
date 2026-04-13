@@ -466,6 +466,31 @@
       transform: scale(1.1);
       background: #ff0000;
     }
+
+    /* Switch Style */
+    .switch input:checked + .slider {
+      background-color: var(--admin-accent);
+    }
+
+    .switch input:focus + .slider {
+      box-shadow: 0 0 1px var(--admin-accent);
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
   </style>
 </head>
 <body class="admin-body">
@@ -712,9 +737,20 @@
             </div>
 
             <form id="config-form" style="max-width: 600px; margin: 0 auto;">
+              <div class="form-group" style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--color-warm-white); border: 1px solid #eee;">
+                <div>
+                  <label style="font-size: 0.8rem; font-weight: 600; color: var(--color-black); display: block; margin-bottom: 4px;">Estado de la Barra</label>
+                  <span style="font-size: 0.7rem; color: var(--color-gray);">¿Mostrar anuncio en la web principal?</span>
+                </div>
+                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                  <input type="checkbox" id="config-announcement-active" style="opacity: 0; width: 0; height: 0;">
+                  <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                </label>
+              </div>
+
               <div class="form-group">
                 <label style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-gray); display: block; margin-bottom: 10px;">Texto del Anuncio</label>
-                <textarea id="config-announcement" class="form-control" rows="2" required style="width: 100%; border: 1px solid #eee; padding: 15px; font-family: var(--font-sans); border-radius: 0; background: var(--color-warm-white); resize: none;"></textarea>
+                <textarea id="config-announcement" class="form-control" rows="2" required style="width: 100%; border: 1px solid #eee; padding: 15px; font-family: var(--font-sans); border-radius: 0; background: white; resize: none;"></textarea>
               </div>
               <button type="submit" class="btn btn--primary" style="width: 100%; margin-top: 2rem; padding: 15px; letter-spacing: 0.1em;">Guardar Configuración</button>
             </form>

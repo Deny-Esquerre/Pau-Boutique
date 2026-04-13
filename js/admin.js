@@ -37,6 +37,7 @@ const configForm = document.getElementById('config-form');
 // DOM Elements - Config Testimonials & Announcement
 const configAnnouncementInput = document.getElementById('config-announcement');
 const configAnnouncementPreview = document.getElementById('announcement-preview');
+const configAnnouncementActive = document.getElementById('config-announcement-active');
 const testimonialForm = document.getElementById('testimonial-form');
 const testimonialsListAdmin = document.getElementById('testimonials-admin-list');
 const migrateTBtn = document.getElementById('migrate-testimonials');
@@ -262,11 +263,10 @@ quickLinks.forEach(btn => {
 
 async function initConfigModule() {
   const config = await fetchConfig();
-  if (config && configAnnouncementInput) {
-    configAnnouncementInput.value = config.announcement;
-    if (configAnnouncementPreview) {
-      configAnnouncementPreview.textContent = config.announcement;
-    }
+  if (config) {
+    if (configAnnouncementInput) configAnnouncementInput.value = config.announcement || '';
+    if (configAnnouncementPreview) configAnnouncementPreview.textContent = config.announcement || '';
+    if (configAnnouncementActive) configAnnouncementActive.checked = config.announcementActive !== false;
   }
   loadTestimonialsAdmin();
 }
@@ -285,6 +285,7 @@ if (configForm) {
     toggleLoading(true);
     
     const newAnnouncement = configAnnouncementInput.value.trim();
+    const isActive = configAnnouncementActive.checked;
     
     if (!newAnnouncement) {
       showToast("El texto del anuncio no puede estar vacío", "error");
@@ -295,6 +296,7 @@ if (configForm) {
     try {
       const success = await updateConfig({ 
         announcement: newAnnouncement,
+        announcementActive: isActive,
         updatedAt: new Date()
       });
       

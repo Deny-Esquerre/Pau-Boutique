@@ -41,9 +41,17 @@ export async function updateConfig(data) {
  */
 export async function applyConfig() {
   const config = await fetchConfig();
-  if (config && config.announcement) {
-    const announcementEl = document.getElementById('announcement-text');
-    if (announcementEl) {
+  const announcementBar = document.querySelector('.announcement-bar');
+  const announcementEl = document.getElementById('announcement-text');
+
+  if (config) {
+    // Show/Hide bar based on active status
+    if (announcementBar) {
+      announcementBar.style.display = config.announcementActive !== false ? 'block' : 'none';
+    }
+    
+    // Set text
+    if (config.announcement && announcementEl) {
       announcementEl.textContent = config.announcement;
     }
   }
