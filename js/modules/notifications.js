@@ -15,9 +15,14 @@ export async function initNotifications() {
   // Si ya tenemos permiso o el usuario aún no ha decidido
   if (Notification.permission === 'default' || Notification.permission === 'granted') {
     try {
+      console.log('Solicitando permiso de notificación...');
       const permission = await Notification.requestPermission();
+      console.log('Permiso:', permission);
       if (permission === 'granted') {
-        await saveTokenToFirestore();
+        // Registrar Service Worker antes de pedir el token
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        console.log('Service Worker registrado:', registration);
+        await saveTokenToFirestore(registration);
       }
     } catch (error) {
       console.error('Error al solicitar permiso de notificación:', error);
@@ -61,19 +66,23 @@ export async function initNotifications() {
 /**
  * Gets the FCM token and saves it to Firestore
  */
-async function saveTokenToFirestore() {
+async function saveTokenToFirestore(registration) {
   try {
-    const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
+    const currentToken = await getToken(messaging, { 
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: registration
+    });
+    
     if (currentToken) {
-      // Usamos el token como ID del documento para evitar duplicados
-      const tokenRef = doc(collection(db, "fcm_tokens"), currentToken);
+      console.log('Token obtenido:', currentToken);
+      const tokenRef = doc(db, "fcm_tokens", currentToken);
       await setDoc(tokenRef, {
         token: currentToken,
         userAgent: navigator.userAgent,
         lastSeen: new Date(),
         active: true
       });
-      console.log('Token de notificación registrado correctamente.');
+      console.log('Token de notificación guardado en Firestore.');
       // Opcional: Avisar al usuario una sola vez
       if (!localStorage.getItem('notif_subscribed')) {
         showToast("¡Gracias por suscribirte a nuestras novedades!", "success");
