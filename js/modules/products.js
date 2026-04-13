@@ -2,7 +2,7 @@
 import { db } from '../firebase-config.js';
 import { 
   collection, 
-  getDocs, 
+  onSnapshot, 
   query, 
   where, 
   orderBy 
@@ -12,8 +12,9 @@ import { addToCart } from './cart.js';
 
 // Cache for products to avoid redundant fetches
 let productsCache = [];
+let unsubscribeProducts = null;
 
-export async function renderProducts(filter = 'all') {
+export function renderProducts(filter = 'all') {
   const grid = document.getElementById('products-grid');
   if (!grid) return;
 
@@ -29,53 +30,58 @@ export async function renderProducts(filter = 'all') {
       q = query(productsRef, where("category", "==", filter), orderBy("createdAt", "desc"));
     }
 
-    const querySnapshot = await getDocs(q);
-    productsCache = [];
-    
-    querySnapshot.forEach((doc) => {
-      productsCache.push({ id: doc.id, ...doc.data() });
-    });
+    // Unsubscribe from previous listener if it exists
+    if (unsubscribeProducts) unsubscribeProducts();
 
-    if (productsCache.length === 0) {
-      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;">No se encontraron productos en esta categoría.</div>';
-      return;
-    }
+    unsubscribeProducts = onSnapshot(q, (querySnapshot) => {
+      productsCache = [];
+      querySnapshot.forEach((doc) => {
+        productsCache.push({ id: doc.id, ...doc.data() });
+      });
 
-    grid.innerHTML = productsCache.map(product => {
-      const priceHTML = product.salePrice
-        ? `<span class="product-card__price--original">S/. ${product.price}</span>
-           <span class="product-card__price--sale">S/. ${product.salePrice}</span>`
-        : `S/. ${product.price}`;
+      if (productsCache.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;">No se encontraron productos en esta categoría.</div>';
+        return;
+      }
 
-      const badgeHTML = product.badge
-        ? `<span class="product-card__badge">${product.badge}</span>`
-        : '';
+      grid.innerHTML = productsCache.map(product => {
+        const priceHTML = product.salePrice
+          ? `<span class="product-card__price--original">S/. ${product.price}</span>
+             <span class="product-card__price--sale">S/. ${product.salePrice}</span>`
+          : `S/. ${product.price}`;
 
-      // Handle both legacy 'image' and new 'images' array
-      const rawImg = (product.images && product.images.length > 0) ? product.images[0] : product.image;
-      const imgSrc = rawImg.startsWith('http') ? rawImg : getUnsplashUrl(rawImg);
+        const badgeHTML = product.badge
+          ? `<span class="product-card__badge">${product.badge}</span>`
+          : '';
 
-      return `
-        <div class="product-card" data-category="${product.category}" data-id="${product.id}">
-          <div class="product-card__image-wrap">
-            <img src="${imgSrc}" alt="${product.name}" class="product-card__image" loading="lazy">
-            ${badgeHTML}
-            <div class="product-card__actions">
-              <button class="product-card__add-btn" data-id="${product.id}">
-                Vista Rápida
-              </button>
+        const rawImg = (product.images && product.images.length > 0) ? product.images[0] : (product.image || 'default-product');
+        const imgSrc = rawImg.startsWith('http') ? rawImg : getUnsplashUrl(rawImg);
+
+        return `
+          <div class="product-card" data-category="${product.category}" data-id="${product.id}">
+            <div class="product-card__image-wrap">
+              <img src="${imgSrc}" alt="${product.name}" class="product-card__image" loading="lazy">
+              ${badgeHTML}
+              <div class="product-card__actions">
+                <button class="product-card__add-btn" data-id="${product.id}">
+                  Vista Rápida
+                </button>
+              </div>
+            </div>
+            <div class="product-card__info">
+              <h3 class="product-card__name">${product.name}</h3>
+              <p class="product-card__price">${priceHTML}</p>
             </div>
           </div>
-          <div class="product-card__info">
-            <h3 class="product-card__name">${product.name}</h3>
-            <p class="product-card__price">${priceHTML}</p>
-          </div>
-        </div>
-      `;
-    }).join('');
+        `;
+      }).join('');
 
-    // Reattach listeners
-    attachEventListeners(grid);
+      // Reattach listeners
+      attachEventListeners(grid);
+    }, (error) => {
+      console.error("Error en tiempo real:", error);
+      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;">Error al cargar la colección.</div>';
+    });
 
   } catch (error) {
     console.error("Error al cargar productos:", error);
