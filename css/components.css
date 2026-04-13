@@ -230,8 +230,10 @@
 }
 
 .footer__logo-img {
-  height: 110px;
+  height: 60px;
   width: auto;
+  object-fit: contain;
+  max-width: 100%;
 }
 
 /* --- Overlays --- */
