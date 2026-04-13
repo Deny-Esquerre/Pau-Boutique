@@ -19,13 +19,14 @@ export async function initNotifications() {
       const permission = await Notification.requestPermission();
       console.log('Permiso:', permission);
       if (permission === 'granted') {
-        // Registrar Service Worker antes de pedir el token
-        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        // Registrar Service Worker usando una ruta relativa para mayor compatibilidad (ej: GitHub Pages)
+        const registration = await navigator.serviceWorker.register('firebase-messaging-sw.js');
         console.log('Service Worker registrado:', registration);
         await saveTokenToFirestore(registration);
       }
     } catch (error) {
       console.error('Error al solicitar permiso de notificación:', error);
+      showToast("Error al inicializar notificaciones: " + error.message, "error");
     }
   }
 
@@ -90,8 +91,10 @@ async function saveTokenToFirestore(registration) {
       }
     } else {
       console.log('No se pudo obtener el token de registro. Verifica los permisos.');
+      showToast("No se pudo obtener el permiso del navegador.", "warning");
     }
   } catch (error) {
     console.error('Error al guardar el token FCM en Firestore:', error);
+    showToast("Error de conexión con Firebase: " + error.message, "error");
   }
 }
