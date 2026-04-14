@@ -1,5 +1,6 @@
 import { db } from '../firebase-config.js';
 import { collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+import { initScrollAnimations } from './ui.js';
 
 /**
  * Fetches landing page collections and renders them in the grid
@@ -13,7 +14,7 @@ export async function renderLandingCollections() {
     const querySnapshot = await getDocs(q);
     
     if (querySnapshot.empty) {
-      grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No hay colecciones para mostrar.</p>';
+      grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 2rem;">No hay colecciones para mostrar.</p>';
       return;
     }
 
@@ -24,19 +25,10 @@ export async function renderLandingCollections() {
       card.href = "#productos";
       card.className = "category-card";
       card.setAttribute('data-animate', '');
-      card.onclick = () => {
-        // Al hacer clic, filtramos los productos (si existe la lógica)
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        filterBtns.forEach(btn => {
-          if (btn.dataset.filter === col.name.toLowerCase()) {
-            btn.click();
-          }
-        });
-      };
-
+      
       card.innerHTML = `
-        <div class="category-card__image-wrap">
-          <img src="${col.image}" alt="${col.name}" class="category-card__image">
+        <div class="category-card__image-wrap" style="background: #fdfaf7;">
+          <img src="${col.image}" alt="${col.name}" class="category-card__image" style="background: #fdfaf7;">
         </div>
         <div class="category-card__info">
           <h3 class="category-card__title">${col.name}</h3>
@@ -45,6 +37,11 @@ export async function renderLandingCollections() {
       `;
       grid.appendChild(card);
     });
+
+    // Re-trigger scroll animations after dynamic load
+    setTimeout(() => {
+      initScrollAnimations();
+    }, 100);
 
   } catch (error) {
     console.error("Error al renderizar colecciones:", error);
