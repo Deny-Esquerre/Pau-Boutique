@@ -44,40 +44,36 @@ export async function applyConfig() {
   const announcementBar = document.querySelector('.announcement-bar');
   const announcementEl = document.getElementById('announcement-text');
   
-  // Hero Elements
-  const heroImg = document.getElementById('hero-img');
-  const heroSubtitle = document.getElementById('hero-subtitle');
-  const heroTitle = document.getElementById('hero-title');
-  const heroBtn = document.getElementById('hero-btn');
+    // Hero Elements
+    const heroImg = document.getElementById('hero-img');
+    const heroSubtitle = document.getElementById('hero-subtitle');
+    const heroTitle = document.getElementById('hero-title');
+    const heroBtn = document.getElementById('hero-btn');
 
-  if (config) {
-    // Show/Hide bar based on active status
-    if (announcementBar) {
-      announcementBar.style.display = config.announcementActive !== false ? 'block' : 'none';
-    }
-    
-    // Set text
-    if (config.announcement && announcementEl) {
-      announcementEl.textContent = config.announcement;
-    }
+    // Banner Elements
+    const bImg = document.getElementById('banner-img');
+    const bSubtitle = document.getElementById('banner-subtitle');
+    const bTitle = document.getElementById('banner-title');
+    const bDesc = document.getElementById('banner-desc');
+    const bBtn = document.getElementById('banner-btn');
+    const bContainer = document.getElementById('banner-container');
 
-    // Apply Hero Dynamic Content
-    if (heroImg && config.heroImage) {
-      heroImg.src = config.heroImage;
-      heroImg.onload = () => heroImg.style.opacity = "1";
-    }
-    if (heroSubtitle && config.heroSubtitle) {
-      heroSubtitle.textContent = config.heroSubtitle;
-    }
-    if (heroTitle && config.heroTitle) {
-      heroTitle.innerHTML = config.heroTitle;
-    }
-    if (heroBtn && config.heroBtnText) {
-      heroBtn.textContent = config.heroBtnText;
-    }
+    if (config) {
+      // ... (existing code for announcement)
 
-    // Show Hero Content Container
-    const heroContainer = document.getElementById('hero-container');
-    if (heroContainer) heroContainer.style.opacity = "1";
+      // Apply Hero Dynamic Content
+      // ... (existing code)
+
+      // Apply Banner Dynamic Content
+      if (bImg && config.bannerImage) {
+        bImg.src = config.bannerImage;
+        bImg.onload = () => bImg.style.opacity = "1";
+      }
+      if (bSubtitle && config.bannerSubtitle) bSubtitle.textContent = config.bannerSubtitle;
+      if (bTitle && config.bannerTitle) bTitle.textContent = config.bannerTitle;
+      if (bDesc && config.bannerDesc) bDesc.textContent = config.bannerDesc;
+      if (bBtn && config.bannerBtnText) bBtn.textContent = config.bannerBtnText;
+      if (bContainer) bContainer.style.opacity = "1";
+    }
   }
 }

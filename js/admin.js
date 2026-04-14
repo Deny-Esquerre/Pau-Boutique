@@ -64,6 +64,21 @@ const colImageInput = document.getElementById('col-image');
 const colFileInput = document.getElementById('col-file-input');
 const colUploadStatus = document.getElementById('col-upload-status');
 
+// DOM Elements - Banner Principal
+const bannerForm = document.getElementById('banner-config-form');
+const configBannerImage = document.getElementById('config-banner-image');
+const configBannerSubtitle = document.getElementById('config-banner-subtitle');
+const configBannerTitle = document.getElementById('config-banner-title');
+const configBannerDesc = document.getElementById('config-banner-desc');
+const configBannerBtnText = document.getElementById('config-banner-btn-text');
+const bannerImageInput = document.getElementById('banner-image-input');
+const bannerUploadStatus = document.getElementById('banner-upload-status');
+const bannerAdminPreview = document.getElementById('banner-admin-preview');
+const bannerPreviewSubtitle = document.getElementById('banner-preview-subtitle');
+const bannerPreviewTitle = document.getElementById('banner-preview-title');
+const bannerPreviewDesc = document.getElementById('banner-preview-desc');
+const bannerPreviewBtn = document.getElementById('banner-preview-btn');
+
 // DOM Elements - Form & List (Products)
 const productForm = document.getElementById('product-form');
 const inventoryList = document.getElementById('inventory-list');
@@ -329,6 +344,14 @@ async function initConfigModule() {
     if (configHeroTitle) configHeroTitle.value = config.heroTitle || '';
     if (configHeroBtnText) configHeroBtnText.value = config.heroBtnText || '';
     updateHeroPreview();
+
+    // Banner Principal Load
+    if (configBannerImage) configBannerImage.value = config.bannerImage || '';
+    if (configBannerSubtitle) configBannerSubtitle.value = config.bannerSubtitle || '';
+    if (configBannerTitle) configBannerTitle.value = config.bannerTitle || '';
+    if (configBannerDesc) configBannerDesc.value = config.bannerDesc || '';
+    if (configBannerBtnText) configBannerBtnText.value = config.bannerBtnText || '';
+    updateBannerPreview();
   }
   loadCollectionsAdmin();
   loadTestimonialsAdmin();
@@ -725,6 +748,89 @@ if (newColForm) {
       newColForm.reset();
       if (colUploadStatus) colUploadStatus.textContent = "";
       loadCollectionsAdmin();
+    } catch (error) {
+      showToast("Error: " + error.message, "error");
+    } finally {
+      toggleLoading(false);
+    }
+  });
+}
+
+/* --- Banner (Landing Page) Logic --- */
+
+function updateBannerPreview() {
+  if (!bannerAdminPreview) return;
+  if (configBannerImage.value) {
+    bannerAdminPreview.style.backgroundImage = `url(${configBannerImage.value})`;
+  } else {
+    bannerAdminPreview.style.backgroundImage = 'none';
+  }
+  bannerPreviewSubtitle.textContent = configBannerSubtitle.value || 'SUBTÍTULO';
+  bannerPreviewTitle.textContent = configBannerTitle.value || 'TÍTULO PRINCIPAL';
+  bannerPreviewDesc.textContent = configBannerDesc.value || 'Descripción corta de la temporada...';
+  bannerPreviewBtn.textContent = configBannerBtnText.value || 'BOTÓN';
+}
+
+// Banner Preview Real-time updates
+[configBannerImage, configBannerSubtitle, configBannerTitle, configBannerDesc, configBannerBtnText].forEach(el => {
+  if (el) el.addEventListener('input', updateBannerPreview);
+});
+
+// Cloudinary Banner Upload
+if (bannerImageInput) {
+  bannerImageInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (bannerUploadStatus) bannerUploadStatus.textContent = "SUBIENDO...";
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) throw new Error("Fallo en la subida");
+
+      const result = await response.json();
+      if (result.secure_url) {
+        configBannerImage.value = result.secure_url;
+        updateBannerPreview();
+        if (bannerUploadStatus) bannerUploadStatus.textContent = "¡IMAGEN LISTA!";
+        showToast("Imagen del banner cargada");
+      }
+    } catch (error) {
+      console.error("Error Banner Upload:", error);
+      if (bannerUploadStatus) bannerUploadStatus.textContent = "ERROR AL SUBIR";
+      showToast("Error al subir imagen", "error");
+    }
+  });
+}
+
+if (bannerForm) {
+  bannerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    toggleLoading(true);
+
+    try {
+      const success = await updateConfig({
+        bannerImage: configBannerImage.value.trim(),
+        bannerSubtitle: configBannerSubtitle.value.trim(),
+        bannerTitle: configBannerTitle.value.trim(),
+        bannerDesc: configBannerDesc.value.trim(),
+        bannerBtnText: configBannerBtnText.value.trim(),
+        updatedAt: new Date()
+      });
+
+      if (success) {
+        showToast("¡Banner Principal actualizado!");
+      } else {
+        throw new Error("Error al guardar");
+      }
     } catch (error) {
       showToast("Error: " + error.message, "error");
     } finally {
