@@ -244,23 +244,36 @@ function initConfigNavigation() {
   const configNavBtns = document.querySelectorAll('.config-nav-btn');
   const subModules = document.querySelectorAll('.sub-module');
 
+  if (configNavBtns.length === 0) return;
+
   configNavBtns.forEach(btn => {
-    // Eliminar listener previo para evitar duplicados
     btn.onclick = (e) => {
-      const subId = btn.dataset.sub;
+      e.preventDefault();
+      const subId = btn.getAttribute('data-sub');
       
-      // Update buttons
+      console.log("Activando sub-módulo:", subId);
+
+      // 1. Limpiar todos los botones
       configNavBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
       
-      // Update sub-modules
-      subModules.forEach(mod => {
-        if (mod.id === `sub-mod-${subId}`) {
-          mod.classList.add('active');
-        } else {
-          mod.classList.remove('active');
-        }
+      // 2. Ocultar todos los sub-módulos con fuerza
+      subModules.forEach(m => {
+        m.classList.remove('active');
+        m.style.setProperty('display', 'none', 'important');
       });
+
+      // 3. Activar el botón actual
+      btn.classList.add('active');
+
+      // 4. Mostrar el sub-módulo destino
+      const targetMod = document.getElementById(`sub-mod-${subId}`);
+      if (targetMod) {
+        targetMod.classList.add('active');
+        targetMod.style.setProperty('display', 'block', 'important');
+        
+        // Inicializar Lucide para los nuevos iconos si es necesario
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      }
     };
   });
 }
