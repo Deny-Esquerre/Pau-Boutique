@@ -34,6 +34,19 @@ const sidebar = document.querySelector('.sidebar');
 const sidebarOverlay = document.getElementById('sidebar-overlay');
 const configForm = document.getElementById('config-form');
 
+// DOM Elements - Hero Principal
+const heroForm = document.getElementById('hero-config-form');
+const configHeroImage = document.getElementById('config-hero-image');
+const configHeroSubtitle = document.getElementById('config-hero-subtitle');
+const configHeroTitle = document.getElementById('config-hero-title');
+const configHeroBtnText = document.getElementById('config-hero-btn-text');
+const heroImageInput = document.getElementById('hero-image-input');
+const heroUploadStatus = document.getElementById('hero-upload-status');
+const heroAdminPreview = document.getElementById('hero-admin-preview');
+const heroPreviewSubtitle = document.getElementById('hero-preview-subtitle');
+const heroPreviewTitle = document.getElementById('hero-preview-title');
+const heroPreviewBtn = document.getElementById('hero-preview-btn');
+
 // DOM Elements - Config Testimonials & Announcement
 const configAnnouncementInput = document.getElementById('config-announcement');
 const configAnnouncementPreview = document.getElementById('announcement-preview');
@@ -212,6 +225,7 @@ function switchModule(moduleId) {
   sidebarLinks.forEach(link => link.dataset.mod === moduleId ? link.classList.add('active') : link.classList.remove('active'));
   
   if (moduleId === 'config') {
+    initConfigNavigation();
     initConfigModule();
   }
   if (moduleId === 'notifications') {
@@ -226,27 +240,30 @@ function switchModule(moduleId) {
 }
 
 // Sub-navigation for Config
-const configNavBtns = document.querySelectorAll('.config-nav-btn');
-const subModules = document.querySelectorAll('.sub-module');
+function initConfigNavigation() {
+  const configNavBtns = document.querySelectorAll('.config-nav-btn');
+  const subModules = document.querySelectorAll('.sub-module');
 
-configNavBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const subId = btn.dataset.sub;
-    
-    // Update buttons
-    configNavBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    // Update sub-modules
-    subModules.forEach(mod => {
-      if (mod.id === `sub-mod-${subId}`) {
-        mod.classList.add('active');
-      } else {
-        mod.classList.remove('active');
-      }
-    });
+  configNavBtns.forEach(btn => {
+    // Eliminar listener previo para evitar duplicados
+    btn.onclick = (e) => {
+      const subId = btn.dataset.sub;
+      
+      // Update buttons
+      configNavBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Update sub-modules
+      subModules.forEach(mod => {
+        if (mod.id === `sub-mod-${subId}`) {
+          mod.classList.add('active');
+        } else {
+          mod.classList.remove('active');
+        }
+      });
+    };
   });
-});
+}
 
 sidebarLinks.forEach(link => {
   link.addEventListener('click', (e) => {
@@ -284,8 +301,94 @@ async function initConfigModule() {
     if (configAnnouncementInput) configAnnouncementInput.value = config.announcement || '';
     if (configAnnouncementPreview) configAnnouncementPreview.textContent = config.announcement || '';
     if (configAnnouncementActive) configAnnouncementActive.checked = config.announcementActive !== false;
+
+    // Hero Principal Load
+    if (configHeroImage) configHeroImage.value = config.heroImage || '';
+    if (configHeroSubtitle) configHeroSubtitle.value = config.heroSubtitle || '';
+    if (configHeroTitle) configHeroTitle.value = config.heroTitle || '';
+    if (configHeroBtnText) configHeroBtnText.value = config.heroBtnText || '';
+    updateHeroPreview();
   }
   loadTestimonialsAdmin();
+}
+
+function updateHeroPreview() {
+  if (!heroAdminPreview) return;
+  if (configHeroImage.value) {
+    heroAdminPreview.style.backgroundImage = `url(${configHeroImage.value})`;
+  } else {
+    heroAdminPreview.style.backgroundImage = 'none';
+  }
+  heroPreviewSubtitle.textContent = configHeroSubtitle.value || 'SUBTÍTULO';
+  heroPreviewTitle.innerHTML = configHeroTitle.value || 'TÍTULO<br>PRINCIPAL';
+  heroPreviewBtn.textContent = configHeroBtnText.value || 'BOTÓN';
+}
+
+// Hero Preview Real-time updates
+[configHeroImage, configHeroSubtitle, configHeroTitle, configHeroBtnText].forEach(el => {
+  if (el) el.addEventListener('input', updateHeroPreview);
+});
+
+// Cloudinary Hero Upload (Directo)
+if (heroImageInput) {
+  heroImageInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (heroUploadStatus) heroUploadStatus.textContent = "SUBIENDO...";
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) throw new Error("Fallo en la subida");
+
+      const result = await response.json();
+      if (result.secure_url) {
+        configHeroImage.value = result.info?.secure_url || result.secure_url;
+        updateHeroPreview();
+        if (heroUploadStatus) heroUploadStatus.textContent = "¡CARGADA CON ÉXITO!";
+        showToast("Imagen del Hero actualizada");
+      }
+    } catch (error) {
+      console.error("Error Hero Upload:", error);
+      if (heroUploadStatus) heroUploadStatus.textContent = "ERROR AL SUBIR";
+      showToast("Error al subir la imagen", "error");
+    }
+  });
+}
+
+if (heroForm) {
+  heroForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    toggleLoading(true);
+
+    try {
+      const success = await updateConfig({
+        heroImage: configHeroImage.value.trim(),
+        heroSubtitle: configHeroSubtitle.value.trim(),
+        heroTitle: configHeroTitle.value.trim(),
+        heroBtnText: configHeroBtnText.value.trim(),
+        updatedAt: new Date()
+      });
+
+      if (success) {
+        showToast("¡Hero Principal actualizado!");
+      } else {
+        throw new Error("Error al guardar");
+      }
+    } catch (error) {
+      showToast("Error: " + error.message, "error");
+    } finally {
+      toggleLoading(false);
+    }
+  });
 }
 
 if (configAnnouncementInput) {
