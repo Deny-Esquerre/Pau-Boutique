@@ -359,14 +359,14 @@ async function initConfigModule() {
 
 function updateHeroPreview() {
   if (!heroAdminPreview) return;
-  if (configHeroImage.value) {
+  if (configHeroImage && configHeroImage.value) {
     heroAdminPreview.style.backgroundImage = `url(${configHeroImage.value})`;
   } else {
     heroAdminPreview.style.backgroundImage = 'none';
   }
-  heroPreviewSubtitle.textContent = configHeroSubtitle.value || 'SUBTÍTULO';
-  heroPreviewTitle.innerHTML = configHeroTitle.value || 'TÍTULO<br>PRINCIPAL';
-  heroPreviewBtn.textContent = configHeroBtnText.value || 'BOTÓN';
+  if (heroPreviewSubtitle) heroPreviewSubtitle.textContent = (configHeroSubtitle ? configHeroSubtitle.value : '') || 'SUBTÍTULO';
+  if (heroPreviewTitle) heroPreviewTitle.innerHTML = (configHeroTitle ? configHeroTitle.value : '') || 'TÍTULO<br>PRINCIPAL';
+  if (heroPreviewBtn) heroPreviewBtn.textContent = (configHeroBtnText ? configHeroBtnText.value : '') || 'BOTÓN';
 }
 
 // Hero Preview Real-time updates
@@ -760,15 +760,15 @@ if (newColForm) {
 
 function updateBannerPreview() {
   if (!bannerAdminPreview) return;
-  if (configBannerImage.value) {
+  if (configBannerImage && configBannerImage.value) {
     bannerAdminPreview.style.backgroundImage = `url(${configBannerImage.value})`;
   } else {
     bannerAdminPreview.style.backgroundImage = 'none';
   }
-  bannerPreviewSubtitle.textContent = configBannerSubtitle.value || 'SUBTÍTULO';
-  bannerPreviewTitle.textContent = configBannerTitle.value || 'TÍTULO PRINCIPAL';
-  bannerPreviewDesc.textContent = configBannerDesc.value || 'Descripción corta de la temporada...';
-  bannerPreviewBtn.textContent = configBannerBtnText.value || 'BOTÓN';
+  if (bannerPreviewSubtitle) bannerPreviewSubtitle.textContent = (configBannerSubtitle ? configBannerSubtitle.value : '') || 'SUBTÍTULO';
+  if (bannerPreviewTitle) bannerPreviewTitle.textContent = (configBannerTitle ? configBannerTitle.value : '') || 'TÍTULO PRINCIPAL';
+  if (bannerPreviewDesc) bannerPreviewDesc.textContent = (configBannerDesc ? configBannerDesc.value : '') || 'Descripción corta de la temporada...';
+  if (bannerPreviewBtn) bannerPreviewBtn.textContent = (configBannerBtnText ? configBannerBtnText.value : '') || 'BOTÓN';
 }
 
 // Banner Preview Real-time updates
