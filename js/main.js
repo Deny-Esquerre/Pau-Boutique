@@ -15,12 +15,14 @@ import {
 import { openLoginModal, closeLoginModal, handleAdminLogin } from './modules/auth.js';
 import { applyConfig } from './modules/config.js';
 import { initNotifications } from './modules/notifications.js';
+import { renderLandingCollections } from './modules/collections.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize Modules
   loadStaticImages();
   renderProducts();
+  renderLandingCollections();
   applyConfig();
   initHeaderScroll();
   initMobileMenu();

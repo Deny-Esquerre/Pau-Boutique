@@ -56,6 +56,14 @@ const testimonialsListAdmin = document.getElementById('testimonials-admin-list')
 const migrateTBtn = document.getElementById('migrate-testimonials');
 const refreshTBtn = document.getElementById('refresh-testimonials');
 
+// DOM Elements - Collections (Landing Page)
+const collectionsAdminList = document.getElementById('collections-admin-list');
+const newColForm = document.getElementById('new-collection-form');
+const colNameInput = document.getElementById('col-name');
+const colImageInput = document.getElementById('col-image');
+const colFileInput = document.getElementById('col-file-input');
+const colUploadStatus = document.getElementById('col-upload-status');
+
 // DOM Elements - Form & List (Products)
 const productForm = document.getElementById('product-form');
 const inventoryList = document.getElementById('inventory-list');
@@ -322,6 +330,7 @@ async function initConfigModule() {
     if (configHeroBtnText) configHeroBtnText.value = config.heroBtnText || '';
     updateHeroPreview();
   }
+  loadCollectionsAdmin();
   loadTestimonialsAdmin();
 }
 
@@ -597,6 +606,130 @@ if (refreshTBtn) {
   refreshTBtn.addEventListener('click', (e) => {
     e.preventDefault();
     loadTestimonialsAdmin();
+  });
+}
+
+/* --- Collections (Landing Page) Logic --- */
+
+async function loadCollectionsAdmin() {
+  if (!collectionsAdminList) return;
+  collectionsAdminList.innerHTML = '<p style="text-align: center; color: #999; grid-column: 1/-1;">Buscando colecciones...</p>';
+  
+  try {
+    const querySnapshot = await getDocs(collection(db, "categories_landing"));
+    collectionsAdminList.innerHTML = '';
+
+    if (querySnapshot.empty) {
+      collectionsAdminList.innerHTML = '<p style="text-align: center; color: #999; grid-column: 1/-1;">No hay colecciones creadas aún.</p>';
+      return;
+    }
+
+    querySnapshot.forEach((docSnap) => {
+      const col = docSnap.data();
+      const card = document.createElement('div');
+      card.style.background = "white";
+      card.style.border = "1px solid #eee";
+      card.style.borderRadius = "4px";
+      card.style.overflow = "hidden";
+      card.style.position = "relative";
+      card.style.paddingBottom = "10px";
+      
+      card.innerHTML = `
+        <img src="${col.image || ''}" style="width: 100%; height: 180px; object-fit: cover; background: #f5f5f5;">
+        <div style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+          <h4 style="margin: 0; font-size: 0.9rem; text-transform: uppercase;">${col.name}</h4>
+          <button class="btn-delete-col" data-id="${docSnap.id}" style="color: #d9534f; border: none; background: none; cursor: pointer; padding: 5px;">
+            <i data-lucide="trash-2" style="width: 16px;"></i>
+          </button>
+        </div>
+      `;
+      collectionsAdminList.appendChild(card);
+    });
+    
+    lucide.createIcons();
+
+    // Listener para borrar
+    document.querySelectorAll('.btn-delete-col').forEach(btn => {
+      btn.onclick = async () => {
+        if (confirm("¿Eliminar esta colección de la página principal?")) {
+          toggleLoading(true);
+          try {
+            await deleteDoc(doc(db, "categories_landing", btn.dataset.id));
+            showToast("Colección eliminada");
+            loadCollectionsAdmin();
+          } catch (error) {
+            showToast("Error: " + error.message, "error");
+          } finally {
+            toggleLoading(false);
+          }
+        }
+      };
+    });
+
+  } catch (error) {
+    console.error("Error al cargar colecciones:", error);
+  }
+}
+
+// Subida de imagen de colección
+if (colFileInput) {
+  colFileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (colUploadStatus) colUploadStatus.textContent = "SUBIENDO...";
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) throw new Error("Fallo en la subida");
+
+      const result = await response.json();
+      if (result.secure_url) {
+        colImageInput.value = result.secure_url;
+        if (colUploadStatus) colUploadStatus.textContent = "¡IMAGEN LISTA!";
+        showToast("Imagen de colección cargada");
+      }
+    } catch (error) {
+      console.error("Error col image upload:", error);
+      if (colUploadStatus) colUploadStatus.textContent = "ERROR AL SUBIR";
+      showToast("Error al subir imagen", "error");
+    }
+  });
+}
+
+if (newColForm) {
+  newColForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!colImageInput.value) {
+      showToast("Por favor sube una imagen primero", "error");
+      return;
+    }
+
+    toggleLoading(true);
+    try {
+      await addDoc(collection(db, "categories_landing"), {
+        name: colNameInput.value.trim(),
+        image: colImageInput.value,
+        createdAt: new Date()
+      });
+      
+      showToast("¡Colección añadida!");
+      newColForm.reset();
+      if (colUploadStatus) colUploadStatus.textContent = "";
+      loadCollectionsAdmin();
+    } catch (error) {
+      showToast("Error: " + error.message, "error");
+    } finally {
+      toggleLoading(false);
+    }
   });
 }
 
