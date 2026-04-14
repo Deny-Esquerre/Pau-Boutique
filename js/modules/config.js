@@ -64,6 +64,7 @@ export async function applyConfig() {
     // Apply Hero Dynamic Content
     if (heroImg && config.heroImage) {
       heroImg.src = config.heroImage;
+      heroImg.onload = () => heroImg.style.opacity = "1";
     }
     if (heroSubtitle && config.heroSubtitle) {
       heroSubtitle.textContent = config.heroSubtitle;
@@ -74,5 +75,9 @@ export async function applyConfig() {
     if (heroBtn && config.heroBtnText) {
       heroBtn.textContent = config.heroBtnText;
     }
+
+    // Show Hero Content Container
+    const heroContainer = document.getElementById('hero-container');
+    if (heroContainer) heroContainer.style.opacity = "1";
   }
 }
