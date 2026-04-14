@@ -43,6 +43,12 @@ export async function applyConfig() {
   const config = await fetchConfig();
   const announcementBar = document.querySelector('.announcement-bar');
   const announcementEl = document.getElementById('announcement-text');
+  
+  // Hero Elements
+  const heroImg = document.getElementById('hero-img');
+  const heroSubtitle = document.getElementById('hero-subtitle');
+  const heroTitle = document.getElementById('hero-title');
+  const heroBtn = document.getElementById('hero-btn');
 
   if (config) {
     // Show/Hide bar based on active status
@@ -53,6 +59,20 @@ export async function applyConfig() {
     // Set text
     if (config.announcement && announcementEl) {
       announcementEl.textContent = config.announcement;
+    }
+
+    // Apply Hero Dynamic Content
+    if (heroImg && config.heroImage) {
+      heroImg.src = config.heroImage;
+    }
+    if (heroSubtitle && config.heroSubtitle) {
+      heroSubtitle.textContent = config.heroSubtitle;
+    }
+    if (heroTitle && config.heroTitle) {
+      heroTitle.innerHTML = config.heroTitle;
+    }
+    if (heroBtn && config.heroBtnText) {
+      heroBtn.textContent = config.heroBtnText;
     }
   }
 }
