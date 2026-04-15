@@ -67,6 +67,7 @@ const colUploadStatus = document.getElementById('col-upload-status');
 // DOM Elements - Banner Principal
 const bannerForm = document.getElementById('banner-config-form');
 const configBannerImage = document.getElementById('config-banner-image');
+const configBannerImageActive = document.getElementById('config-banner-image-active');
 const configBannerSubtitle = document.getElementById('config-banner-subtitle');
 const configBannerTitle = document.getElementById('config-banner-title');
 const configBannerDesc = document.getElementById('config-banner-desc');
@@ -347,6 +348,7 @@ async function initConfigModule() {
 
     // Banner Principal Load
     if (configBannerImage) configBannerImage.value = config.bannerImage || '';
+    if (configBannerImageActive) configBannerImageActive.checked = config.bannerImageActive !== false;
     if (configBannerSubtitle) configBannerSubtitle.value = config.bannerSubtitle || '';
     if (configBannerTitle) configBannerTitle.value = config.bannerTitle || '';
     if (configBannerDesc) configBannerDesc.value = config.bannerDesc || '';
@@ -760,10 +762,13 @@ if (newColForm) {
 
 function updateBannerPreview() {
   if (!bannerAdminPreview) return;
-  if (configBannerImage && configBannerImage.value) {
+  const isActive = configBannerImageActive ? configBannerImageActive.checked : true;
+  
+  if (isActive && configBannerImage && configBannerImage.value) {
     bannerAdminPreview.style.backgroundImage = `url(${configBannerImage.value})`;
   } else {
     bannerAdminPreview.style.backgroundImage = 'none';
+    bannerAdminPreview.style.backgroundColor = '#1a1a1a'; // Fondo oscuro si no hay imagen
   }
   if (bannerPreviewSubtitle) bannerPreviewSubtitle.textContent = (configBannerSubtitle ? configBannerSubtitle.value : '') || 'SUBTÍTULO';
   if (bannerPreviewTitle) bannerPreviewTitle.textContent = (configBannerTitle ? configBannerTitle.value : '') || 'TÍTULO PRINCIPAL';
@@ -772,8 +777,9 @@ function updateBannerPreview() {
 }
 
 // Banner Preview Real-time updates
-[configBannerImage, configBannerSubtitle, configBannerTitle, configBannerDesc, configBannerBtnText].forEach(el => {
+[configBannerImage, configBannerImageActive, configBannerSubtitle, configBannerTitle, configBannerDesc, configBannerBtnText].forEach(el => {
   if (el) el.addEventListener('input', updateBannerPreview);
+  if (el && el.type === 'checkbox') el.addEventListener('change', updateBannerPreview);
 });
 
 // Cloudinary Banner Upload
@@ -819,6 +825,7 @@ if (bannerForm) {
     try {
       const success = await updateConfig({
         bannerImage: configBannerImage.value.trim(),
+        bannerImageActive: configBannerImageActive.checked,
         bannerSubtitle: configBannerSubtitle.value.trim(),
         bannerTitle: configBannerTitle.value.trim(),
         bannerDesc: configBannerDesc.value.trim(),

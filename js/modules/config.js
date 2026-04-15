@@ -80,13 +80,17 @@ export async function applyConfig() {
     if (heroImg) heroImg.style.opacity = "1";
 
     // Banner Dynamic Content
-    if (bImg && config.bannerImage) bImg.src = config.bannerImage;
+    if (bImg && config.bannerImage) {
+      bImg.src = config.bannerImage;
+      bImg.style.opacity = config.bannerImageActive !== false ? "1" : "0";
+    }
     if (bSubtitle && config.bannerSubtitle) bSubtitle.textContent = config.bannerSubtitle;
     if (bTitle && config.bannerTitle) bTitle.textContent = config.bannerTitle;
     if (bDesc && config.bannerDesc) bDesc.textContent = config.bannerDesc;
     if (bBtn && config.bannerBtnText) bBtn.textContent = config.bannerBtnText;
     if (bContainer) bContainer.style.opacity = "1";
-    if (bImg) bImg.style.opacity = "1";
+    if (bImg && config.bannerImageActive === false) bImg.style.opacity = "0";
+    else if (bImg && config.bannerImage) bImg.style.opacity = "1";
   } else {
     // Si falla la carga, mostrar los elementos de todos modos
     if (heroContainer) heroContainer.style.opacity = "1";
