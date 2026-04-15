@@ -2,20 +2,30 @@
 <footer class="footer">
   <div class="container">
     <div class="footer__grid">
+
+      <!-- LOGO + DESCRIPCIÓN -->
       <div class="footer__col">
         <div class="footer__logo">
           <img src="logo.png" alt="PAU Boutique" class="footer__logo-img">
         </div>
-        <p class="footer__about">Elegancia y sofisticación en cada prenda. Tu destino de moda exclusiva.</p>
+        <p class="footer__about">
+          Elegancia y sofisticación en cada prenda. Tu destino de moda exclusiva.
+        </p>
       </div>
+
+      <!-- TIENDA (DINÁMICO) -->
       <div class="footer__col">
         <h4 class="footer__heading">Tienda</h4>
-        <a href="#" class="footer__link">Nuevos Ingresos</a>
-        <a href="#" class="footer__link">Vestidos</a>
-        <a href="#" class="footer__link">Abrigos</a>
-        <a href="#" class="footer__link">Accesorios</a>
-        <a href="#" class="footer__link">Sale</a>
+
+        <!-- Esto luego lo llenas dinámicamente con Firebase -->
+        <div id="footer-collections">
+          <a href="#" class="footer__link">Colección 1</a>
+          <a href="#" class="footer__link">Colección 2</a>
+          <a href="#" class="footer__link">Colección 3</a>
+        </div>
       </div>
+
+      <!-- INFORMACIÓN -->
       <div class="footer__col">
         <h4 class="footer__heading">Información</h4>
         <a href="#" class="footer__link">Sobre Nosotros</a>
@@ -23,23 +33,51 @@
         <a href="#" class="footer__link">Devoluciones</a>
         <a href="#" class="footer__link">Preguntas Frecuentes</a>
       </div>
+
+      <!-- CONTACTO -->
       <div class="footer__col">
         <h4 class="footer__heading">Contacto</h4>
-        <a href="#" class="footer__link">contacto@pauboutique.com</a>
-        <a href="#" class="footer__link">+51 987 654 321</a>
+        <a href="mailto:pau2025d@gmail.com" class="footer__link">
+          pau2025d@gmail.com
+        </a>
+        <a href="https://wa.me/51923389040" target="_blank" class="footer__link">
+          +51 923 389 040
+        </a>
+
+        <!-- REDES -->
         <div class="footer__social">
-          <a href="#" aria-label="Instagram" class="footer__social-link">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+
+          <!-- Instagram -->
+          <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank"
+            aria-label="Instagram" class="footer__social-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="2" width="20" height="20" rx="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8" />
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+            </svg>
           </a>
-          <a href="#" aria-label="Facebook" class="footer__social-link">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+
+          <!-- Facebook -->
+          <a href="https://www.facebook.com/share/18gxmNwhMK/" target="_blank" aria-label="Facebook"
+            class="footer__social-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
           </a>
-          <a href="#" aria-label="TikTok" class="footer__social-link">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+
+          <!-- TikTok -->
+          <a href="https://www.tiktok.com/@pauboutique?_r=1&_t=ZS-95Y2dmd8MJm" target="_blank" aria-label="TikTok"
+            class="footer__social-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+            </svg>
           </a>
+
         </div>
       </div>
+
     </div>
+
     <div class="footer__bottom">
       <p>&copy; 2026 PAU Boutique. Todos los derechos reservados.</p>
     </div>

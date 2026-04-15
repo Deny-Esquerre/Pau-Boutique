@@ -47,3 +47,40 @@ export async function renderLandingCollections() {
     console.error("Error al renderizar colecciones:", error);
   }
 }
+
+/**
+ * Fetches first 3 collections and renders them in the footer
+ */
+export async function renderFooterCollections() {
+  const container = document.getElementById('footer-collections');
+  if (!container) return;
+
+  try {
+    const q = query(collection(db, "categories_landing"), orderBy("createdAt", "asc"));
+    const querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty) {
+      container.innerHTML = '<p class="footer__link" style="opacity: 0.6;">Sin colecciones</p>';
+      return;
+    }
+
+    container.innerHTML = '';
+    let count = 0;
+    querySnapshot.forEach((docSnap) => {
+      if (count < 3) {
+        const col = docSnap.data();
+        const link = document.createElement('a');
+        link.href = "#productos";
+        link.className = "footer__link";
+        link.textContent = col.name;
+        // Optional: add filter logic here if needed
+        container.appendChild(link);
+        count++;
+      }
+    });
+
+  } catch (error) {
+    console.error("Error al renderizar colecciones en el footer:", error);
+  }
+}
+

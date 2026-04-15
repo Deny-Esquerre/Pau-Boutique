@@ -15,7 +15,7 @@ import {
 import { openLoginModal, closeLoginModal, handleAdminLogin, handleNewsletterSubscription } from './modules/auth.js';
 import { applyConfig } from './modules/config.js';
 import { initNotifications } from './modules/notifications.js';
-import { renderLandingCollections } from './modules/collections.js';
+import { renderLandingCollections, renderFooterCollections } from './modules/collections.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadStaticImages();
   renderProducts();
   renderLandingCollections();
+  renderFooterCollections();
   applyConfig();
   initHeaderScroll();
   initMobileMenu();
