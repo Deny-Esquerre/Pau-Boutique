@@ -12,42 +12,45 @@ export async function initNotifications() {
     return;
   }
 
-  // Si ya tenemos permiso o el usuario aún no ha decidido
-  if (Notification.permission === 'default' || Notification.permission === 'granted') {
-    try {
-      console.log('Solicitando permiso de notificación...');
-      const permission = await Notification.requestPermission();
-      console.log('Permiso:', permission);
-      if (permission === 'granted') {
-        showToast("Permiso concedido. Registrando servicio...", "warning");
-        // Registrar Service Worker usando una ruta relativa
-        const registration = await navigator.serviceWorker.register('firebase-messaging-sw.js');
-        console.log('Service Worker registrado:', registration);
-        await saveTokenToFirestore(registration);
-      } else {
-        showToast("Bloqueaste las notificaciones. Cámbialo en la barra de direcciones.", "warning");
+  // Listener para el formulario de Newsletter
+  const newsletterForm = document.getElementById('newsletter-form');
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const emailInput = newsletterForm.querySelector('input[type="email"]');
+      const email = emailInput ? emailInput.value : '';
+
+      showToast("Procesando suscripción...", "warning");
+
+      try {
+        // 1. Pedir permiso para notificaciones push
+        const permission = await Notification.requestPermission();
+        
+        if (permission === 'granted') {
+          // Registrar Service Worker
+          const registration = await navigator.serviceWorker.register('firebase-messaging-sw.js');
+          await saveTokenToFirestore(registration, email);
+          
+          showToast("¡Suscrita con éxito a las notificaciones!", "success");
+          if (emailInput) emailInput.value = '';
+        } else {
+          showToast("Suscrita por email, pero bloqueaste las notificaciones del navegador.", "warning");
+        }
+      } catch (error) {
+        console.error('Error en suscripción:', error);
+        showToast("Error al suscribirse: " + error.message, "error");
       }
-    } catch (error) {
-      console.error('Error al solicitar permiso de notificación:', error);
-      showToast("Error al inicializar notificaciones: " + error.message, "error");
-    }
+    });
   }
 
   // Listener para mensajes en primer plano (cuando la web está abierta)
   onMessage(messaging, (payload) => {
     console.log('Mensaje en primer plano recibido: ', payload);
     const { title, body } = payload.notification;
-    
-    // Mostramos un toast o una alerta de Lucide
-    if (window.showToast) {
-       showToast(`${title}: ${body}`, "success");
-    } else {
-       alert(`${title}\n${body}`);
-    }
+    showToast(`${title}: ${body}`, "success");
   });
 
-  // Listener de "Pseudo-Push": Detectar nuevos mensajes en Firestore en tiempo real
-  // Esto permite ver notificaciones mientras la web está abierta sin configuraciones complejas de servidor.
+  // Listener de "Pseudo-Push" en tiempo real vía Firestore
   const now = new Date();
   const q = query(
     collection(db, "notifications_history"),
@@ -60,8 +63,7 @@ export async function initNotifications() {
     snapshot.docChanges().forEach((change) => {
       if (change.type === "added") {
         const data = change.doc.data();
-        console.log("Nueva notificación detectada (Live):", data);
-        showToast(`Pau Boutique: ${data.title}\n${data.body}`, "success");
+        showToast(`PAU: ${data.title}\n${data.body}`, "success");
       }
     });
   });
@@ -70,35 +72,25 @@ export async function initNotifications() {
 /**
  * Gets the FCM token and saves it to Firestore
  */
-async function saveTokenToFirestore(registration) {
+async function saveTokenToFirestore(registration, email = "") {
   try {
-    showToast("Conectando con Google Firebase...", "warning");
     const currentToken = await getToken(messaging, { 
       vapidKey: VAPID_KEY,
       serviceWorkerRegistration: registration
     });
     
     if (currentToken) {
-      console.log('Token obtenido:', currentToken);
       const tokenRef = doc(db, "fcm_tokens", currentToken);
       await setDoc(tokenRef, {
         token: currentToken,
+        email: email, // Asociamos el email al token
         userAgent: navigator.userAgent,
-        lastSeen: new Date(),
+        createdAt: new Date(),
         active: true
       });
-      console.log('Token de notificación guardado en Firestore.');
-      // Opcional: Avisar al usuario una sola vez
-      if (!localStorage.getItem('notif_subscribed')) {
-        showToast("¡Gracias por suscribirte a nuestras novedades!", "success");
-        localStorage.setItem('notif_subscribed', 'true');
-      }
-    } else {
-      console.log('No se pudo obtener el token de registro. Verifica los permisos.');
-      showToast("No se pudo obtener el permiso del navegador.", "warning");
+      localStorage.setItem('notif_subscribed', 'true');
     }
   } catch (error) {
-    console.error('Error al guardar el token FCM en Firestore:', error);
-    showToast("Error de conexión con Firebase: " + error.message, "error");
+    console.error('Error al guardar token:', error);
   }
 }
