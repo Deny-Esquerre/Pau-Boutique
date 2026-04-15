@@ -112,3 +112,26 @@ export function initScrollAnimations() {
   }, { threshold: 0.15 });
   document.querySelectorAll('[data-animate], .hero').forEach(el => observer.observe(el));
 }
+
+export function openInfoModal(title, htmlContent) {
+  const modal = document.getElementById('product-modal');
+  const content = document.getElementById('modal-content');
+  const overlay = document.getElementById('overlay');
+
+  if (!modal || !content || !overlay) return;
+
+  content.innerHTML = `
+    <div class="modal__info" style="padding: 3rem 2rem; max-width: 100%; text-align: left; align-items: flex-start;">
+      <h2 class="modal__title" style="margin-bottom: 1.5rem; font-size: 1.8rem; text-align: left; width: 100%;">${title}</h2>
+      <div class="modal__desc" style="text-align: left; width: 100%;">
+        ${htmlContent}
+      </div>
+      <button class="btn btn--primary" style="margin-top: 2rem; width: 100%;" onclick="document.getElementById('modal-close').click()">Cerrar</button>
+    </div>
+  `;
+
+  modal.classList.add('active');
+  overlay.classList.add('active');
+  document.body.classList.add('no-scroll');
+}
+
