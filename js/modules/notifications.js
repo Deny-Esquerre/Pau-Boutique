@@ -19,6 +19,7 @@ export async function initNotifications() {
       e.preventDefault();
       const emailInput = newsletterForm.querySelector('input[type="email"]');
       const email = emailInput ? emailInput.value : '';
+      const parentContainer = newsletterForm.parentElement;
 
       showToast("Procesando suscripción...", "warning");
 
@@ -31,10 +32,30 @@ export async function initNotifications() {
           const registration = await navigator.serviceWorker.register('firebase-messaging-sw.js');
           await saveTokenToFirestore(registration, email);
           
-          showToast("¡Suscrita con éxito a las notificaciones!", "success");
-          if (emailInput) emailInput.value = '';
+          // Mostrar mensaje de éxito en pantalla
+          if (parentContainer) {
+            parentContainer.innerHTML = `
+              <div class="newsletter__success" style="animation: fadeIn 0.5s ease; padding: 20px;">
+                <i data-lucide="check-circle" style="width: 40px; height: 40px; color: var(--color-accent); margin-bottom: 15px;"></i>
+                <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 10px;">¡Bienvenida al Mundo PAU!</h3>
+                <p style="font-size: 0.9rem; color: var(--color-gray);">Te has suscrito con éxito. Pronto recibirás nuestras novedades directamente en tu navegador.</p>
+              </div>
+            `;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+          }
+          
+          showToast("¡Suscrita con éxito!", "success");
         } else {
-          showToast("Suscrita por email, pero bloqueaste las notificaciones del navegador.", "warning");
+          // Si no dio permiso Push, al menos confirmar la suscripción por email en pantalla
+          if (parentContainer) {
+            parentContainer.innerHTML = `
+              <div class="newsletter__success" style="animation: fadeIn 0.5s ease; padding: 20px;">
+                <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 10px;">¡Gracias por suscribirte!</h3>
+                <p style="font-size: 0.9rem; color: var(--color-gray);">Te enviaremos novedades a <strong>${email}</strong>.</p>
+              </div>
+            `;
+          }
+          showToast("Suscrita por email.", "success");
         }
       } catch (error) {
         console.error('Error en suscripción:', error);

@@ -12,7 +12,7 @@ import {
   initSmoothScroll, 
   initScrollAnimations 
 } from './modules/ui.js';
-import { openLoginModal, closeLoginModal, handleAdminLogin } from './modules/auth.js';
+import { openLoginModal, closeLoginModal, handleAdminLogin, handleNewsletterSubscription } from './modules/auth.js';
 import { applyConfig } from './modules/config.js';
 import { initNotifications } from './modules/notifications.js';
 import { renderLandingCollections } from './modules/collections.js';
@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginClose = document.getElementById('login-close');
   const openLoginBtns = document.querySelectorAll('.open-login');
   const loginForm = document.getElementById('admin-login-form');
+  const newsletterForm = document.getElementById('newsletter-form');
   const filterBtns = document.querySelectorAll('.filter-btn');
 
   if (cartIcon) {
@@ -85,4 +86,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Newsletter subscription
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const emailInput = newsletterForm.querySelector('input[type="email"]');
+      if (emailInput) {
+        handleNewsletterSubscription(emailInput.value);
+        emailInput.value = '';
+      }
+    });
+  }
+
 });
+
