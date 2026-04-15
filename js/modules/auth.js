@@ -77,17 +77,21 @@ function showToast(message, type = 'success') {
     transform: translateX(-50%) translateY(20px);
     background: ${type === 'success' ? '#1a1a1a' : '#d9534f'};
     color: #fff;
-    padding: 1rem 2rem;
+    padding: 1.2rem 1.5rem;
     font-family: var(--font-sans, sans-serif);
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    border-radius: 2px;
+    border-radius: 4px;
     z-index: 9999;
     opacity: 0;
     transition: opacity 0.35s ease, transform 0.35s ease;
     pointer-events: none;
-    white-space: nowrap;
+    text-align: center;
+    width: 90%;
+    max-width: 450px;
+    line-height: 1.5;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   `;
   document.body.appendChild(toast);
 
@@ -122,7 +126,7 @@ export async function handleNewsletterSubscription(email) {
       email: email.toLowerCase().trim(),
       subscribedAt: serverTimestamp()
     });
-    showToast('¡Bienvenida al mundo PAU! 🌸 Ya eres parte de nuestra comunidad.');
+    showToast('¡Bienvenida al Mundo PAU! Te has suscrito con éxito. Pronto recibirás nuestras novedades directamente en tu navegador.');
   } catch (error) {
     console.error('Newsletter subscription error:', error);
     showToast('Ocurrió un error. Inténtalo de nuevo.', 'error');
