@@ -40,10 +40,11 @@ async function switchModule(moduleId) {
   // Carga dinámica de HTML con caché
   if (!cache[moduleId]) {
     try {
-      const response = await fetch(`components/admin/${moduleId}.html`);
+      const response = await fetch(`./components/admin/${moduleId}.html`);
       if (!response.ok) throw new Error("Módulo no encontrado");
       cache[moduleId] = await response.text();
     } catch (error) {
+      console.error(error);
       showToast("Error al cargar interfaz", "error");
       return;
     }
@@ -51,6 +52,12 @@ async function switchModule(moduleId) {
 
   // Inyectar HTML
   mainContent.innerHTML = cache[moduleId];
+
+  // IMPORTANTE: Asegurar que la sección inyectada tenga la clase 'active' para ser visible por CSS
+  const injectedSection = mainContent.querySelector('.module-section');
+  if (injectedSection) {
+    injectedSection.classList.add('active');
+  }
 
   // Inicializar lógica del módulo
   try {
@@ -75,7 +82,10 @@ async function switchModule(moduleId) {
 
 function initAdminNavigation() {
   document.querySelectorAll('.sidebar__link').forEach(link => {
-    link.onclick = (e) => { e.preventDefault(); switchModule(link.dataset.mod); };
+    link.onclick = (e) => {
+      e.preventDefault();
+      switchModule(link.dataset.mod);
+    };
   });
 
   if (sidebarToggle) {
