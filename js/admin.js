@@ -240,8 +240,8 @@ onAuthStateChanged(auth, (user) => {
     adminWrapper.style.display = 'flex';
     initDashboard();
   } else {
-    loginSection.style.display = 'flex';
-    adminWrapper.style.display = 'none';
+    // Si no hay sesión, volver al inicio para usar el modal de cuenta unificado
+    window.location.href = 'index.html';
   }
 });
 
