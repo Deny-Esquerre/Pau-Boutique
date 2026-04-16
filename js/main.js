@@ -1,32 +1,169 @@
 /* ===================================================
-   PAU BOUTIQUE — Main Entry Point
+   PAU BOUTIQUE — Main Entry Point (Optimized & Cached)
    =================================================== */
 
+import { db } from './firebase-config.js';
+import { doc, getDoc, collection, getDocs, orderBy, query, onSnapshot, where, limit } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 import { loadStaticImages } from './modules/utils.js';
-import { renderProducts, renderCategoryFilters, closeModal } from './modules/products.js';
-import { closeCart, openCart } from './modules/cart.js';
+import { closeModal } from './modules/products.js';
+import { closeCart, openCart, addToCart } from './modules/cart.js';
 import { 
-  initHeaderScroll, 
-  initMobileMenu, 
-  initTestimonials, 
-  initSmoothScroll, 
-  initScrollAnimations,
-  openInfoModal
+  initHeaderScroll, initMobileMenu, initTestimonials, 
+  initSmoothScroll, initScrollAnimations, openInfoModal
 } from './modules/ui.js';
-import { handleNewsletterSubscription } from './modules/auth.js';
-import { applyConfig } from './modules/config.js';
+import { handleNewsletterSubscription, openLoginModal, closeLoginModal, handleAdminLogin } from './modules/auth.js';
 import { initNotifications } from './modules/notifications.js';
-import { renderLandingCollections, renderFooterCollections } from './modules/collections.js';
-import { openLoginModal, closeLoginModal, handleAdminLogin } from './modules/auth.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+// --- CONFIGURATION ---
+const CACHE_KEY = 'pb_cache';
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
-  // Initialize Modules
+// --- CACHE ENGINE ---
+const cacheManager = {
+  get(key) {
+    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+    const item = cache[key];
+    if (item && (Date.now() - item.timestamp < CACHE_TTL)) return item.data;
+    return null;
+  },
+  set(key, data) {
+    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+    cache[key] = { data, timestamp: Date.now() };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  }
+};
+
+// --- CLOUDINARY OPTIMIZER ---
+const optimizeUrl = (url, params) => {
+  if (!url || typeof url !== 'string' || !url.includes('cloudinary.com')) return url;
+  return url.replace('upload/', `upload/${params}/`);
+};
+
+// --- OPTIMIZED DATA FETCHERS ---
+const fetchConfigCached = async () => {
+  const cached = cacheManager.get('config');
+  if (cached) return cached;
+  const snap = await getDoc(doc(db, 'settings', 'general'));
+  const data = snap.exists() ? snap.data() : null;
+  if (data) cacheManager.set('config', data);
+  return data;
+};
+
+const fetchCollectionsCached = async () => {
+  const cached = cacheManager.get('collections');
+  if (cached) return cached;
+  const q = query(collection(db, "categories_landing"), orderBy("createdAt", "asc"));
+  const snap = await getDocs(q);
+  const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  if (data.length) cacheManager.set('collections', data);
+  return data;
+};
+
+// --- RENDERERS (Optimized with Cloudinary) ---
+const applyConfigOptimized = (config) => {
+  if (!config) return;
+  const heroImg = document.getElementById('hero-img');
+  const bImg = document.getElementById('banner-img');
+  
+  if (config.heroImage && heroImg) heroImg.src = optimizeUrl(config.heroImage, 'w_1400,q_auto,f_auto');
+  if (config.bannerImage && bImg) bImg.src = optimizeUrl(config.bannerImage, 'w_1400,q_auto,f_auto');
+  
+  document.getElementById('announcement-bar').style.display = config.announcementActive ? 'block' : 'none';
+  document.getElementById('announcement-text').textContent = config.announcement;
+  document.getElementById('hero-subtitle').textContent = config.heroSubtitle;
+  document.getElementById('hero-title').innerHTML = config.heroTitle;
+  document.getElementById('hero-btn').textContent = config.heroBtnText;
+  document.getElementById('hero-container').style.opacity = "1";
+  
+  const bTitle = document.getElementById('banner-title');
+  if (bTitle) {
+    bTitle.textContent = config.bannerTitle;
+    document.getElementById('banner-subtitle').textContent = config.bannerSubtitle;
+    document.getElementById('banner-desc').textContent = config.bannerDesc;
+    document.getElementById('banner-btn').textContent = config.bannerBtnText;
+    document.getElementById('banner-container').style.opacity = "1";
+  }
+};
+
+const renderCollectionsOptimized = (cols) => {
+  const grid = document.getElementById('categories-grid');
+  const footer = document.getElementById('footer-collections');
+  if (!grid || !cols) return;
+
+  grid.innerHTML = cols.map(col => `
+    <a href="#productos" class="category-card" data-animate>
+      <div class="category-card__image-wrap">
+        <img src="${optimizeUrl(col.image, 'w_600,q_auto,f_auto')}" alt="${col.name}" class="category-card__image" loading="lazy">
+      </div>
+      <div class="category-card__info">
+        <h3 class="category-card__title">${col.name}</h3>
+        <span class="category-card__link">Ver colección &rarr;</span>
+      </div>
+    </a>
+  `).join('');
+
+  if (footer) {
+    footer.innerHTML = cols.slice(0, 3).map(col => `<a href="#productos" class="footer__link">${col.name}</a>`).join('');
+  }
+  initScrollAnimations();
+};
+
+const renderProductsFresh = () => {
+  const grid = document.getElementById('products-grid');
+  const q = query(collection(db, "products"), orderBy("createdAt", "desc"), limit(12));
+  
+  onSnapshot(q, (snap) => {
+    const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    grid.innerHTML = products.map(p => `
+      <div class="product-card" data-id="${p.id}">
+        <div class="product-card__image-wrap">
+          <img src="${optimizeUrl(p.images?.[0] || p.image, 'w_600,q_auto,f_auto')}" alt="${p.name}" class="product-card__image" loading="lazy">
+          ${p.badge ? `<span class="product-card__badge">${p.badge}</span>` : ''}
+          <div class="product-card__actions">
+            <button class="product-card__add-btn" data-id="${p.id}">Añadir al Carrito</button>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <h3 class="product-card__name">${p.name}</h3>
+          <p class="product-card__price">S/. ${p.price}</p>
+        </div>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('.product-card__add-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const p = products.find(item => item.id === btn.dataset.id);
+        if (p) addToCart(p);
+      };
+    });
+  });
+};
+
+// --- INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', async () => {
+  // Promise.all for parallel loading
+  const [config, collections] = await Promise.all([
+    fetchConfigCached(),
+    fetchCollectionsCached(),
+    renderProductsFresh()
+  ]);
+
+  applyConfigOptimized(config);
+  renderCollectionsOptimized(collections);
+
+  // Remove Skeletons
+  const hideSkeletons = () => {
+    document.querySelectorAll('.skeleton').forEach(s => s.style.display = 'none');
+    document.getElementById('hero-img').style.opacity = "1";
+    document.getElementById('banner-img').style.opacity = "1";
+  };
+  
+  window.addEventListener('load', hideSkeletons);
+  setTimeout(hideSkeletons, 2000);
+
+  // UI Modules
   loadStaticImages();
-  renderProducts();
-  renderLandingCollections();
-  renderFooterCollections();
-  applyConfig();
   initHeaderScroll();
   initMobileMenu();
   initTestimonials();
@@ -34,143 +171,16 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();
   initNotifications();
 
-  // Global UI Listeners
-  const overlay = document.getElementById('overlay');
-  const cartIcon = document.querySelector('.nav-link--icon[aria-label="Carrito"]');
-  const cartClose = document.getElementById('cart-close');
-  const modalClose = document.getElementById('modal-close');
-  const loginClose = document.getElementById('login-close');
-  const openLoginBtns = document.querySelectorAll('.open-login');
-  const loginForm = document.getElementById('login-form');
-  const newsletterForm = document.getElementById('newsletter-form');
-  const filterBtns = document.querySelectorAll('.filter-btn');
+  // Listeners
+  document.querySelector('.nav-link--icon[aria-label="Carrito"]').onclick = (e) => { e.preventDefault(); openCart(); };
+  document.getElementById('cart-close').onclick = closeCart;
+  document.getElementById('modal-close').onclick = closeModal;
+  document.getElementById('login-close').onclick = closeLoginModal;
+  document.querySelectorAll('.open-login').forEach(btn => btn.onclick = (e) => { e.preventDefault(); openLoginModal(); });
+  document.getElementById('overlay').onclick = () => { closeCart(); closeModal(); closeLoginModal(); };
 
-  if (cartIcon) {
-    cartIcon.addEventListener('click', (e) => {
-      e.preventDefault();
-      openCart();
-    });
-  }
-
-  if (cartClose) cartClose.addEventListener('click', closeCart);
-  if (modalClose) modalClose.addEventListener('click', closeModal);
-  if (loginClose) loginClose.addEventListener('click', closeLoginModal);
-
-  openLoginBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      openLoginModal();
-    });
-  });
-
-  if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      const pass = document.getElementById('login-password').value;
-      handleAdminLogin(email, pass);
-    });
-  }
-  
-  if (overlay) {
-    overlay.addEventListener('click', () => {
-      closeCart();
-      closeModal();
-      closeLoginModal();
-    });
-  }
-
-  // Filter functionality
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderProducts(btn.dataset.filter);
-    });
-  });
-
-  // Newsletter subscription
-  if (newsletterForm) {
-    newsletterForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const emailInput = newsletterForm.querySelector('input[type="email"]');
-      if (emailInput) {
-        handleNewsletterSubscription(emailInput.value);
-        emailInput.value = '';
-      }
-    });
-  }
-
-  // Information Modals Listeners
-  const shippingLinks = ['link-shipping', 'link-shipping-footer'];
-  const returnsLinks = ['link-returns', 'link-returns-footer'];
-  const aboutLinks = ['link-about', 'link-about-footer'];
-
-  const shippingContent = `
-    <div style="font-family: var(--font-sans); color: var(--color-charcoal); line-height: 1.7;">
-      <p style="margin-bottom: 1.5rem;"><strong>Primer pedido:</strong> ¡El envío es totalmente gratis!</p>
-      <p style="margin-bottom: 1.5rem;"><strong>Pedidos posteriores:</strong> El cliente cubre el costo del delivery.</p>
-      <p style="margin-bottom: 1.5rem;">El costo de envío por cambio o devolución será cubierto por <strong>Pau Boutique</strong> si el error es nuestro. Si es por otro motivo, el costo de retorno corre por cuenta del cliente.</p>
-      <p style="margin-top: 2rem; border-top: 1px solid #eee; padding-top: 1.5rem;">
-        <strong>Cómo Solicitar:</strong><br>
-        Escribe a <a href="mailto:pau2025d@gmail.com" style="color: var(--color-black); text-decoration: underline;">pau2025d@gmail.com</a><br>
-        WhatsApp: <a href="https://wa.me/51923389040" target="_blank" style="color: var(--color-black); text-decoration: underline;">923 389 040</a><br>
-        Con descripción de pedido y motivo de cambio/devolución.
-      </p>
-    </div>
-  `;
-
-  const returnsContent = `
-    <div style="font-family: var(--font-sans); color: var(--color-charcoal); line-height: 1.7;">
-      <h3 style="font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 0.8rem; color: var(--color-black);">Cambios</h3>
-      <p style="margin-bottom: 1.5rem;">Puedes cambiar tu producto dentro de los <strong>5 días posteriores a la recepción</strong>. El producto debe estar sin usar, con etiquetas y en su empaque original.</p>
-      
-      <h3 style="font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 0.8rem; color: var(--color-black);">Devoluciones</h3>
-      <p style="margin-bottom: 1.5rem;">Las devoluciones son aceptadas solo por productos defectuosos, dañados o erróneos. El reembolso se realiza en un código de descuento o reembolso a tu método de pago original, según corresponda.</p>
-      
-      <p style="margin-top: 2rem; border-top: 1px solid #eee; padding-top: 1.5rem;">
-        <strong>Contacto para solicitudes:</strong><br>
-        WhatsApp: <a href="https://wa.me/51923389040" target="_blank" style="color: var(--color-black); text-decoration: underline;">923 389 040</a>
-      </p>
-    </div>
-  `;
-
-  const aboutContent = `
-    <div style="font-family: var(--font-sans); color: var(--color-charcoal); line-height: 1.8;">
-      <p style="margin-bottom: 1rem;">En <strong>Pau Boutique</strong> creemos que la moda es una forma de expresión y confianza. Iniciamos este sueño hace 8 años vendiendo joyas de acero quirúrgico.</p>
-      <p style="margin-bottom: 1rem;">Descubrimos la oportunidad de ofrecer prendas que hagan sentir cómodas, seguras y lindas a otras mujeres. Creciendo poco a poco, hoy contamos con un espacio organizado para brindarte lo mejor.</p>
-      <p>Hoy no solo vendemos ropa, ayudamos a que cada mujer se sienta segura, cómoda y auténtica en su día a día.</p>
-    </div>
-  `;
-
-  shippingLinks.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('click', (e) => {
-        e.preventDefault();
-        openInfoModal('Política de Envíos', shippingContent);
-      });
-    }
-  });
-
-  returnsLinks.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('click', (e) => {
-        e.preventDefault();
-        openInfoModal('Cambios y Devoluciones', returnsContent);
-      });
-    }
-  });
-
-  aboutLinks.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('click', (e) => {
-        e.preventDefault();
-        openInfoModal('Sobre Nosotros', aboutContent);
-      });
-    }
-  });
-
+  document.getElementById('login-form').onsubmit = (e) => {
+    e.preventDefault();
+    handleAdminLogin(document.getElementById('login-email').value, document.getElementById('login-password').value);
+  };
 });

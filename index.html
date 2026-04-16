@@ -13,12 +13,34 @@
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="css/main.css">
+  <style>
+    /* Skeleton Shimmer Optimization */
+    .skeleton {
+      background: #f6f7f8;
+      background-image: linear-gradient(90deg, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+      border-radius: 4px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -100% 0; }
+      100% { background-position: 100% 0; }
+    }
+
+    .hero-skeleton { width: 100%; height: 80vh; position: absolute; top: 0; left: 0; z-index: 0; }
+    .product-skeleton { aspect-ratio: 3/4; width: 100%; margin-bottom: 1rem; }
+    .category-skeleton { aspect-ratio: 3/4; width: 100%; }
+    
+    [data-loading="true"] { visibility: hidden; }
+    .loaded { opacity: 1 !important; visibility: visible !important; }
+  </style>
 </head>
 
 <body>
 
   <!-- Announcement Bar -->
-  <div class="announcement-bar">
+  <div class="announcement-bar" id="announcement-bar" style="display: none;">
     <p id="announcement-text">&nbsp;</p>
   </div>
 
@@ -32,7 +54,7 @@
       </nav>
 
       <a href="#" class="header__logo">
-        <img src="images/logo/logo.png" alt="PAU Boutique" class="header__logo-img">
+        <img src="images/logo/logo.png" alt="PAU Boutique" class="header__logo-img" width="160" height="80">
       </a>
 
       <div class="header__nav header__nav--right">
@@ -70,9 +92,10 @@
 
   <!-- Hero -->
   <section class="hero" id="hero">
+    <div id="hero-skeleton" class="skeleton hero-skeleton"></div>
     <div class="hero__media">
       <img src="" alt="Pau Boutique" class="hero__image" id="hero-img"
-        style="opacity: 0; transition: opacity 0.5s ease;">
+        style="opacity: 0; transition: opacity 0.5s ease;" fetchpriority="high">
     </div>
     <div class="hero__overlay"></div>
     <div class="hero__content" id="hero-container" style="opacity: 0; transition: opacity 0.5s ease;">
@@ -92,7 +115,10 @@
       </div>
 
       <div class="categories__grid" id="categories-grid">
-        <!-- Inyectado dinámicamente desde Firebase -->
+        <!-- Skeleton placeholders -->
+        <div class="skeleton category-skeleton"></div>
+        <div class="skeleton category-skeleton"></div>
+        <div class="skeleton category-skeleton"></div>
       </div>
     </div>
   </section>
@@ -101,7 +127,7 @@
   <section class="featured-banner">
     <div class="featured-banner__media">
       <img src="" alt="Nueva Temporada" class="featured-banner__image" id="banner-img"
-        style="opacity: 0; transition: opacity 0.5s ease;">
+        style="opacity: 0; transition: opacity 0.5s ease;" loading="lazy">
     </div>
     <div class="featured-banner__overlay"></div>
     <div class="featured-banner__content" id="banner-container" data-animate
@@ -124,11 +150,14 @@
 
       <div class="products__filters" id="category-filters">
         <button class="filter-btn active" data-filter="all">Todos</button>
-        <!-- Categories dynamic -->
       </div>
 
       <div class="products__grid" id="products-grid">
-        <!-- Products dynamic -->
+        <!-- Skeleton placeholders -->
+        <div class="skeleton product-skeleton"></div>
+        <div class="skeleton product-skeleton"></div>
+        <div class="skeleton product-skeleton"></div>
+        <div class="skeleton product-skeleton"></div>
       </div>
 
       <div class="products__cta">
@@ -142,7 +171,7 @@
     <div class="container">
       <div class="about__grid">
         <div class="about__image-wrap" data-animate>
-          <img src="" alt="Nuestra historia" class="about__image" id="about-img">
+          <img src="" alt="Nuestra historia" class="about__image" id="about-img" loading="lazy">
         </div>
         <div class="about__content" data-animate>
           <span class="about__label">Sobre Nosotros</span>
@@ -169,10 +198,7 @@
       </div>
 
       <div class="testimonials__carousel" id="testimonials-carousel">
-        <!-- Injected by Firebase -->
-        <p
-          style="text-align: center; color: var(--color-gray); font-family: var(--font-serif); font-style: italic; padding: 2rem;">
-          Cargando testimonios de nuestras clientas...</p>
+        <div class="skeleton" style="height: 200px; width: 100%;"></div>
       </div>
       <div class="testimonials__dots" id="testimonial-dots"></div>
     </div>
@@ -202,18 +228,18 @@
     </div>
     <div class="instagram__grid" id="instagram-grid">
       <!-- Original items -->
-      <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank" class="instagram__item"><img src="" alt="Instagram 1" id="insta-img-1"></a>
-      <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank" class="instagram__item"><img src="" alt="Instagram 2" id="insta-img-2"></a>
-      <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank" class="instagram__item"><img src="" alt="Instagram 3" id="insta-img-3"></a>
-      <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank" class="instagram__item"><img src="" alt="Instagram 4" id="insta-img-4"></a>
-      <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank" class="instagram__item"><img src="" alt="Instagram 5" id="insta-img-5"></a>
+      <a href="#" target="_blank" class="instagram__item"><img src="" alt="Instagram 1" id="insta-img-1" loading="lazy"></a>
+      <a href="#" target="_blank" class="instagram__item"><img src="" alt="Instagram 2" id="insta-img-2" loading="lazy"></a>
+      <a href="#" target="_blank" class="instagram__item"><img src="" alt="Instagram 3" id="insta-img-3" loading="lazy"></a>
+      <a href="#" target="_blank" class="instagram__item"><img src="" alt="Instagram 4" id="insta-img-4" loading="lazy"></a>
+      <a href="#" target="_blank" class="instagram__item"><img src="" alt="Instagram 5" id="insta-img-5" loading="lazy"></a>
       
       <!-- Duplicated items for infinite loop -->
-      <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank" class="instagram__item"><img src="" alt="Instagram 1 duplicate" id="insta-img-1-dup"></a>
-      <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank" class="instagram__item"><img src="" alt="Instagram 2 duplicate" id="insta-img-2-dup"></a>
-      <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank" class="instagram__item"><img src="" alt="Instagram 3 duplicate" id="insta-img-3-dup"></a>
-      <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank" class="instagram__item"><img src="" alt="Instagram 4 duplicate" id="insta-img-4-dup"></a>
-      <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank" class="instagram__item"><img src="" alt="Instagram 5 duplicate" id="insta-img-5-dup"></a>
+      <a href="#" target="_blank" class="instagram__item"><img src="" alt="Instagram 1 duplicate" id="insta-img-1-dup" loading="lazy"></a>
+      <a href="#" target="_blank" class="instagram__item"><img src="" alt="Instagram 2 duplicate" id="insta-img-2-dup" loading="lazy"></a>
+      <a href="#" target="_blank" class="instagram__item"><img src="" alt="Instagram 3 duplicate" id="insta-img-3-dup" loading="lazy"></a>
+      <a href="#" target="_blank" class="instagram__item"><img src="" alt="Instagram 4 duplicate" id="insta-img-4-dup" loading="lazy"></a>
+      <a href="#" target="_blank" class="instagram__item"><img src="" alt="Instagram 5 duplicate" id="insta-img-5-dup" loading="lazy"></a>
     </div>
   </section>
 
@@ -223,14 +249,15 @@
       <div class="footer__grid">
         <div class="footer__col">
           <div class="footer__logo">
-            <img src="images/logo/logo.png" alt="PAU Boutique" class="footer__logo-img">
+            <img src="images/logo/logo.png" alt="PAU Boutique" class="footer__logo-img" loading="lazy" width="120">
             <p class="footer__about">Elegancia y sofisticación en cada prenda. Tu destino de moda exclusiva.</p>
           </div>
         </div>
         <div class="footer__col">
           <h4 class="footer__heading">Tienda</h4>
           <div id="footer-collections">
-            <!-- Cargando colecciones... -->
+            <div class="skeleton" style="height: 1rem; width: 80%; margin-bottom: 0.5rem;"></div>
+            <div class="skeleton" style="height: 1rem; width: 60%;"></div>
           </div>
         </div>
         <div class="footer__col">
@@ -245,19 +272,19 @@
           <a href="mailto:pau2025d@gmail.com" class="footer__link">pau2025d@gmail.com</a>
           <a href="https://wa.me/51923389040" target="_blank" class="footer__link">+51 923 389 040</a>
           <div class="footer__social">
-            <a href="https://www.instagram.com/pauboutique.p?igsh=MTM1ejc5a3JzMTVscg==" target="_blank" aria-label="Instagram" class="footer__social-link">
+            <a href="#" target="_blank" aria-label="Instagram" class="footer__social-link">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
               </svg>
             </a>
-            <a href="https://www.facebook.com/share/18gxmNwhMK/" target="_blank" aria-label="Facebook" class="footer__social-link">
+            <a href="#" target="_blank" aria-label="Facebook" class="footer__social-link">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
               </svg>
             </a>
-            <a href="https://www.tiktok.com/@pauboutique?_r=1&_t=ZS-95Y2dmd8MJm" target="_blank" aria-label="TikTok" class="footer__social-link">
+            <a href="#" target="_blank" aria-label="TikTok" class="footer__social-link">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
               </svg>
@@ -320,6 +347,8 @@
       </div>
     </div>
   </div>
+
+  <div class="toast-container" id="toast-container"></div>
 
   <script src="js/main.js" type="module"></script>
 
