@@ -1,5 +1,5 @@
 /* --- Cart Logic --- */
-import { getUnsplashUrl } from './utils.js';
+import { getUnsplashUrl, showToast } from './utils.js';
 
 let cart = [];
 
@@ -13,6 +13,9 @@ export function addToCart(product) {
   // Check if already in cart (optional: increase quantity if needed)
   cart.push({ ...product });
   updateCartUI();
+  
+  // Notificación y abrir carrito
+  showToast(`${product.name} añadido al carrito`);
   openCart();
 }
 

@@ -43,7 +43,8 @@
       inset: 0;
       background: white;
       z-index: 1000;
-      display: none; /* Oculto por defecto */
+      display: none;
+      /* Oculto por defecto */
       align-items: center;
       justify-content: center;
     }
@@ -206,21 +207,47 @@
     /* Mobile Header */
     .mobile-admin-header {
       display: none;
-      background: var(--admin-sidebar-bg);
-      color: white;
-      padding: 10px 15px;
-      justify-content: flex-start;
+      background: white;
+      /* Cambiado a blanco para elegancia */
+      color: var(--color-black);
+      height: 70px;
+      padding: 0 20px;
+      justify-content: space-between;
       align-items: center;
-      z-index: 110;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1100;
+      box-sizing: border-box;
+      border-bottom: 1px solid #eee;
+    }
+
+    .mobile-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      height: 100%;
+    }
+
+    .mobile-logo img {
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+      /* Filtro eliminado para mostrar el logo real */
     }
 
     .sidebar-toggle {
       background: transparent;
       border: none;
-      color: white;
+      color: var(--color-black);
+      /* Icono oscuro sobre fondo blanco */
       cursor: pointer;
       display: flex;
       align-items: center;
+      padding: 10px;
+      margin-left: -10px;
     }
 
     /* Sidebar Overlay (Backdrop) */
@@ -228,7 +255,8 @@
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
+      z-index: 1500;
+      /* Por debajo del sidebar pero sobre el resto */
       display: none;
       animation: fadeIn 0.3s ease;
     }
@@ -241,6 +269,7 @@
     @media (max-width: 992px) {
       body.admin-body {
         flex-direction: column;
+        padding-top: 70px;
       }
 
       .mobile-admin-header {
@@ -248,31 +277,57 @@
       }
 
       .admin-wrapper {
-        position: relative;
-        flex: 1;
-        display: block;
-        overflow: hidden;
+        height: calc(100vh - 70px);
       }
 
       .sidebar {
         position: fixed;
-        left: 0;
+        left: -100%;
         top: 0;
-        bottom: 0;
+        height: 100vh;
         width: 280px;
-        transform: translateX(-100%);
-        z-index: 1000;
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
+        transition: left 0.3s ease;
+        z-index: 2000;
+        /* Siempre al frente al abrirse */
+        box-shadow: 15px 0 30px rgba(0, 0, 0, 0.2);
       }
 
       .sidebar.active {
-        transform: translateX(0);
+        left: 0;
       }
 
       .main-content {
-        padding: 1.5rem 1rem 4rem;
-        height: calc(100vh - 50px);
+        padding: 2rem 1.5rem;
+        height: auto;
+        overflow-x: hidden;
       }
+    }
+
+    position: relative;
+    flex: 1;
+    display: block;
+    overflow: hidden;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 280px;
+      transform: translateX(-100%);
+      z-index: 1000;
+      box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar.active {
+      transform: translateX(0);
+    }
+
+    .main-content {
+      padding: 1.5rem 1rem 4rem;
+      height: calc(100vh - 50px);
+    }
     }
 
     /* Toast Notifications - Pau Boutique Style */
@@ -548,6 +603,11 @@
     <button class="sidebar-toggle" id="sidebar-toggle">
       <i data-lucide="menu"></i>
     </button>
+    <!-- Logo móvil centrado -->
+    <div class="mobile-logo">
+      <img src="images/logo/logo.png" alt="PAU">
+    </div>
+    <div style="width: 40px;"></div> <!-- Espaciador para equilibrio visual -->
   </header>
 
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
