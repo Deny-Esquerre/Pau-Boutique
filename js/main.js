@@ -17,7 +17,7 @@ import { handleNewsletterSubscription } from './modules/auth.js';
 import { applyConfig } from './modules/config.js';
 import { initNotifications } from './modules/notifications.js';
 import { renderLandingCollections, renderFooterCollections } from './modules/collections.js';
-import { openLoginModal, closeLoginModal } from './modules/auth.js';
+import { openLoginModal, closeLoginModal, handleAdminLogin } from './modules/auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalClose = document.getElementById('modal-close');
   const loginClose = document.getElementById('login-close');
   const openLoginBtns = document.querySelectorAll('.open-login');
+  const loginForm = document.getElementById('login-form');
   const newsletterForm = document.getElementById('newsletter-form');
   const filterBtns = document.querySelectorAll('.filter-btn');
 
@@ -61,6 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
       openLoginModal();
     });
   });
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const pass = document.getElementById('login-password').value;
+      handleAdminLogin(email, pass);
+    });
+  }
   
   if (overlay) {
     overlay.addEventListener('click', () => {
