@@ -22,26 +22,16 @@ export async function handleAdminLogin(email, password) {
 }
 
 /**
- * Abre el modal de login, pero si el usuario ya tiene sesión activa,
- * redirige directamente al dashboard de administrador.
+ * Abre el modal de login para los clientes.
  */
 export function openLoginModal() {
-  // Verificar si ya hay sesión activa
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // Sesión activa → ir directo al panel
-      window.location.href = 'admin.html';
-    } else {
-      // Sin sesión → mostrar modal de login
-      const modal = document.getElementById('login-modal');
-      const overlay = document.getElementById('overlay');
-      if (modal && overlay) {
-        modal.classList.add('active');
-        overlay.classList.add('active');
-        document.body.classList.add('no-scroll');
-      }
-    }
-  });
+  const modal = document.getElementById('login-modal');
+  const overlay = document.getElementById('overlay');
+  if (modal && overlay) {
+    modal.classList.add('active');
+    overlay.classList.add('active');
+    document.body.classList.add('no-scroll');
+  }
 }
 
 export function closeLoginModal() {
