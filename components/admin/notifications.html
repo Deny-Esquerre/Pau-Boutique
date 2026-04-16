@@ -1,0 +1,67 @@
+<!-- Notifications Module -->
+<section id="mod-notifications" class="module-section">
+  <div class="content-header">
+    <h1>Centro de Notificaciones</h1>
+    <p>Envía mensajes personalizados a tus clientas favoritas.</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <p class="stat-card__label">Suscriptoras Activas</p>
+      <p class="stat-card__value" id="stat-subscribers">0</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-card__label">Mensajes Enviados</p>
+      <p class="stat-card__value" id="stat-total-notifications">0</p>
+    </div>
+  </div>
+
+  <div class="admin-card"
+    style="background: white; padding: 2.5rem; border-radius: 4px; border: 1px solid #f0f0f0;">
+    <h3
+      style="margin-top: 0; font-family: var(--font-serif); font-size: 1.8rem; margin-bottom: 2rem; color: var(--color-black); text-align: center;">
+      Nueva Notificación Push</h3>
+
+    <form id="notification-form" style="max-width: 600px; margin: 0 auto;">
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label
+          style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-gray); display: block; margin-bottom: 10px;">Título
+          de la Notificación</label>
+        <input type="text" id="notif-title" class="form-control" placeholder="Ej: ¡Nueva Colección Otoño!"
+          required
+          style="width: 100%; border: 1px solid #eee; padding: 15px; font-family: var(--font-sans); background: white;">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label
+          style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-gray); display: block; margin-bottom: 10px;">Mensaje</label>
+        <textarea id="notif-body" class="form-control" rows="3"
+          placeholder="Ej: Descubre las nuevas prendas que tenemos para ti..." required
+          style="width: 100%; border: 1px solid #eee; padding: 15px; font-family: var(--font-sans); background: white; resize: none;"></textarea>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 2rem;">
+        <label
+          style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-gray); display: block; margin-bottom: 10px;">Imagen
+          de Notificación (Opcional)</label>
+        <input type="url" id="notif-image" class="form-control" placeholder="Ej: https://tudominio.com/imagen.png"
+          style="width: 100%; border: 1px solid #eee; padding: 15px; font-family: var(--font-sans); background: white;">
+        <small style="color: #999; font-size: 0.7rem; margin-top: 5px; display: block;">Se recomienda una imagen
+          cuadrada para mejor visualización.</small>
+      </div>
+
+      <button type="submit" class="btn btn--primary"
+        style="width: 100%; padding: 15px; letter-spacing: 0.1em;">Enviar a todas las suscriptoras</button>
+    </form>
+  </div>
+
+  <div class="admin-card"
+    style="background: white; padding: 2.5rem; border-radius: 4px; border: 1px solid #f0f0f0; margin-top: 3rem;">
+    <h3
+      style="margin-top: 0; font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--color-black);">
+      Historial de Notificaciones</h3>
+    <div id="notifications-history-list" style="display: flex; flex-direction: column; gap: 15px;">
+      <p style="text-align: center; color: #999; padding: 1rem;">No hay mensajes enviados recientemente.</p>
+    </div>
+  </div>
+</section>

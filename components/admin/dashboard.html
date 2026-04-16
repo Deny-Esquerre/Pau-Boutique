@@ -1,0 +1,40 @@
+<!-- Dashboard Module -->
+<section id="mod-dashboard" class="module-section active">
+  <div class="content-header">
+    <h1>Resumen de Boutique</h1>
+    <p>Bienvenida al panel de control de Pau Boutique.</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <p class="stat-card__label">Total Productos</p>
+      <p class="stat-card__value" id="stat-total-products">0</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-card__label">Categorías</p>
+      <p class="stat-card__value" id="stat-categories">0</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-card__label">Imágenes Cloudinary</p>
+      <p class="stat-card__value" id="stat-images">Activo</p>
+    </div>
+  </div>
+
+  <!-- Working on this module message -->
+  <div
+    style="background: rgba(196, 164, 132, 0.1); border: 1px dashed var(--admin-accent); padding: 2rem; border-radius: 8px; text-align: center; margin-bottom: 2rem;">
+    <i data-lucide="construction"
+      style="width: 40px; height: 40px; color: var(--admin-accent); margin-bottom: 1rem;"></i>
+    <h2 style="font-family: var(--font-serif); margin-bottom: 0.5rem;">Módulo en Construcción</h2>
+    <p style="color: #666; font-size: 0.9rem;">Actualmente estamos trabajando en mejorar las estadísticas y el
+      reporte de ventas de este panel. ¡Pronto verás más detalles aquí!</p>
+  </div>
+
+  <div class="admin-card">
+    <h3>Acciones Rápidas</h3>
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+      <button class="btn btn--outline-dark quick-link" data-mod="products">Nuevo Producto</button>
+      <button id="migrate-btn" class="btn btn--outline-dark">Re-Migrar Datos</button>
+    </div>
+  </div>
+</section>

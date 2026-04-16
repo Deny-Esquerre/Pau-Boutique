@@ -1,0 +1,109 @@
+<!-- Products Module -->
+<section id="mod-products" class="module-section">
+  <div class="content-header">
+    <h1>Gestión de Productos</h1>
+    <p>Añade o edita piezas de tu colección.</p>
+  </div>
+
+  <div class="admin-card" style="background: white; padding: 2rem; border-radius: 8px;">
+    <h3>Añadir Nueva Pieza</h3>
+    <form id="product-form" style="margin-top: 1.5rem;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" id="p-name" class="form-control" required
+            style="width: 100%; border: 1px solid #ddd; padding: 10px;">
+        </div>
+        <div class="form-group">
+          <label>Precio (S/.)</label>
+          <input type="number" id="p-price" class="form-control" step="0.01" required
+            style="width: 100%; border: 1px solid #ddd; padding: 10px;">
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 1rem;">
+        <label>Descripción</label>
+        <textarea id="p-desc" class="form-control" rows="3" required
+          style="width: 100%; border: 1px solid #ddd; padding: 10px;"></textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+        <div class="form-group">
+          <label
+            style="font-size: 0.7rem; color: var(--color-gray); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 8px;">Categoría</label>
+          <div style="display: flex; gap: 10px;">
+            <select id="p-category" class="form-control"
+              style="flex: 1; border: 1px solid #eee; padding: 12px; border-radius: 0; background: var(--color-warm-white); font-family: var(--font-sans);">
+              <!-- Injected by JS -->
+            </select>
+            <button type="button" id="manage-cats-btn"
+              style="background: var(--admin-sidebar-bg); color: white; border: none; padding: 0 15px; cursor: pointer; border-radius: 2px;"
+              title="Gestionar Categorías">
+              <i data-lucide="plus" style="width: 16px;"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label
+            style="font-size: 0.7rem; color: var(--color-gray); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 8px;">Etiqueta
+            (Opcional)</label>
+          <input type="text" id="p-badge" class="form-control" placeholder="Ej: Nuevo"
+            style="width: 100%; border: 1px solid #eee; padding: 12px; border-radius: 0; background: var(--color-warm-white); font-family: var(--font-sans);">
+        </div>
+      </div>
+
+      <!-- Modal / Sub-form for Categories (Initially Hidden) -->
+      <div id="cat-manager-panel"
+        style="display: none; margin-top: 1.5rem; padding: 1.5rem; border: 1px solid var(--admin-accent); background: var(--color-warm-white); border-radius: 4px;">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+          <h4 style="margin: 0; font-family: var(--font-serif); font-size: 1.2rem; color: var(--color-black);">
+            Gestionar Categorías</h4>
+          <button type="button" id="close-cat-manager"
+            style="background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--color-gray);">&times;</button>
+        </div>
+
+        <div id="cat-list-admin"
+          style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; min-height: 40px;">
+          <!-- Chips de categorías -->
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <label
+            style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-gray);">Nueva
+            Categoría</label>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="new-cat-name" placeholder="Ej: Joyería"
+              style="flex: 1; border: 1px solid #ddd; padding: 10px; font-family: var(--font-sans); border-radius: 0; background: white; min-width: 0;">
+            <button type="button" id="save-new-cat" class="btn btn--primary"
+              style="padding: 10px 25px; font-size: 0.75rem; white-space: nowrap; flex-shrink: 0;">Añadir</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 1.5rem;">
+        <label>Galería del Producto (Máximo 3 fotos)</label>
+        <div class="native-upload-container">
+          <input type="file" id="p-images-input" multiple accept="image/*" style="display: none;">
+
+          <label for="p-images-input" class="upload-dropzone" id="dropzone">
+            <i data-lucide="cloud-upload" style="width: 40px; height: 40px;"></i>
+            <p>Haz clic para subir o arrastra tus fotos aquí</p>
+            <span>Formatos aceptados: JPG, PNG. Máximo 3 fotos.</span>
+          </label>
+
+          <p id="upload-status"
+            style="margin-top: 10px; font-size: 0.8rem; color: var(--admin-accent); font-weight: 500; text-align: center; min-height: 1.2em;">
+          </p>
+
+          <div id="image-preview" class="preview-grid">
+            <!-- Previews injected by JS -->
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn--primary" style="width: 100%; margin-top: 2rem;">Guardar en
+        Boutique</button>
+    </form>
+  </div>
+</section>
