@@ -1,14 +1,17 @@
 /* --- Cart Logic --- */
 import { getUnsplashUrl } from './utils.js';
-import { products } from './data.js';
 
 let cart = [];
 
-export function addToCart(productId) {
-  const product = products.find(p => p.id === productId);
+/**
+ * Adds a product to the cart.
+ * Accepts the product object directly from Firebase modules.
+ */
+export function addToCart(product) {
   if (!product) return;
 
-  cart.push(product);
+  // Check if already in cart (optional: increase quantity if needed)
+  cart.push({ ...product });
   updateCartUI();
   openCart();
 }
@@ -35,18 +38,26 @@ export function updateCartUI() {
     return;
   }
 
-  cartItems.innerHTML = cart.map((item, index) => `
-    <div class="cart-item">
-      <img src="${getUnsplashUrl(item.image, 200, 250)}" alt="${item.name}" class="cart-item__img">
-      <div class="cart-item__info">
-        <h4>${item.name}</h4>
-        <p>S/. ${item.salePrice || item.price}</p>
-        <button class="cart-item__remove" data-index="${index}">Eliminar</button>
-      </div>
-    </div>
-  `).join('');
+  cartItems.innerHTML = cart.map((item, index) => {
+    const rawImg = (item.images && item.images.length > 0) ? item.images[0] : (item.image || '');
+    const imgSrc = rawImg.startsWith('http') ? rawImg : getUnsplashUrl(rawImg, 200, 250);
 
-  const total = cart.reduce((sum, item) => sum + (item.salePrice || item.price), 0);
+    return `
+      <div class="cart-item">
+        <img src="${imgSrc}" alt="${item.name}" class="cart-item__img">
+        <div class="cart-item__info">
+          <h4>${item.name}</h4>
+          <p>S/. ${item.salePrice || item.price}</p>
+          <button class="cart-item__remove" data-index="${index}">Eliminar</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const total = cart.reduce((sum, item) => {
+    const price = parseFloat(item.salePrice || item.price) || 0;
+    return sum + price;
+  }, 0);
   cartTotal.textContent = `S/. ${total.toFixed(2)}`;
 
   // Add listeners to remove buttons

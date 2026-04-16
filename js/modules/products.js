@@ -109,7 +109,7 @@ export function renderProducts(filter = 'all') {
               ${badgeHTML}
               <div class="product-card__actions">
                 <button class="product-card__add-btn" data-id="${product.id}">
-                  Vista Rápida
+                  Añadir al Carrito
                 </button>
               </div>
             </div>
@@ -142,7 +142,10 @@ function attachEventListeners(grid) {
   grid.querySelectorAll('.product-card__add-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      addToCart(btn.dataset.id);
+      const product = productsCache.find(p => p.id === btn.dataset.id);
+      if (product) {
+        addToCart(product);
+      }
     });
   });
 }
@@ -172,14 +175,14 @@ export function openProductModal(id) {
         <span class="modal__category">${product.category}</span>
         <h2 class="modal__title">${product.name}</h2>
         <div class="modal__price">${priceHTML}</div>
-        <p class="modal__desc">${product.description}</p>
+        <p class="modal__desc">${product.description || 'Elegancia y estilo exclusivo.'}</p>
         <button class="btn btn--primary add-to-cart-modal" data-id="${product.id}">Agregar al Carrito</button>
       </div>
     </div>
   `;
 
   content.querySelector('.add-to-cart-modal').onclick = () => {
-    addToCart(product.id);
+    addToCart(product);
     closeModal();
   };
 

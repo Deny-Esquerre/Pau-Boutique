@@ -104,14 +104,21 @@ export async function applyConfig() {
     for (let i = 0; i < 5; i++) {
       const url = config[`instaImage${i+1}`];
       const imgEl = document.getElementById(`insta-img-${i+1}`);
-      const linkEl = instaLinks[i];
-
-      if (url && imgEl) {
-        imgEl.src = url;
+      const imgDupEl = document.getElementById(`insta-img-${i+1}-dup`);
+      const instaLinks = document.querySelectorAll(`.instagram__item`);
+      
+      if (url) {
+        if (imgEl) imgEl.src = url;
+        if (imgDupEl) imgDupEl.src = url;
       }
-      if (linkEl) {
-        linkEl.href = instaHandleUrl;
-      }
+      
+      // Update links for all (including duplicates)
+      const linkIndices = [i, i + 5];
+      linkIndices.forEach(idx => {
+        if (instaLinks[idx]) {
+          instaLinks[idx].href = instaHandleUrl;
+        }
+      });
     }
   } else {
     // Si falla la carga, mostrar los elementos de todos modos

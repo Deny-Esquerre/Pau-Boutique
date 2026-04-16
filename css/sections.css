@@ -378,23 +378,31 @@
   border-left: none;
 }
 
-/* --- Instagram --- */
+/* --- Instagram Carousel --- */
 .instagram {
   padding: var(--space-lg) 0 0;
+  overflow: hidden; /* Oculta lo que se sale del ancho de pantalla */
 }
 
 .instagram__grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
+  display: flex;
+  width: max-content; /* Permite que el contenedor se extienda lo necesario */
+  animation: scroll-instagram 40s linear infinite; /* 40 segundos para un deslizamiento lento */
+}
+
+.instagram__grid:hover {
+  animation-play-state: paused; /* Se detiene al pasar el mouse */
 }
 
 .instagram__item {
+  width: 250px; /* Tamaño fijo para las imágenes del carrusel */
   aspect-ratio: 1;
+  flex-shrink: 0; /* Evita que se encojan */
   overflow: hidden;
   display: block;
   background-color: var(--color-cream);
   position: relative;
+  margin-right: 4px; /* Pequeño espacio entre fotos */
 }
 
 .instagram__item img {
@@ -406,4 +414,13 @@
 
 .instagram__item:hover img {
   transform: scale(1.05);
+}
+
+@keyframes scroll-instagram {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-250px * 5 - 4px * 5)); /* Desplaza el ancho exacto de 5 imágenes */
+  }
 }
