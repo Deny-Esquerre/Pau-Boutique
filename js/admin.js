@@ -236,14 +236,44 @@ const migrateBtn = document.getElementById('migrate-btn');
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
+    console.log("Acceso concedido:", user.email);
     loginSection.style.display = 'none';
     adminWrapper.style.display = 'flex';
+    
+    // Inicializar navegación y datos
+    initAdminNavigation();
     initDashboard();
   } else {
-    // Si no hay sesión, volver al inicio para usar el modal de cuenta unificado
+    // Si no hay sesión, volver al inicio
     window.location.href = 'index.html';
   }
 });
+
+function initAdminNavigation() {
+  sidebarLinks.forEach(link => {
+    link.onclick = (e) => {
+      e.preventDefault();
+      switchModule(link.dataset.mod);
+    };
+  });
+
+  if (sidebarToggle) {
+    sidebarToggle.onclick = () => {
+      const isActive = sidebar.classList.toggle('active');
+      if (sidebarOverlay) {
+        if (isActive) sidebarOverlay.classList.add('active');
+        else sidebarOverlay.classList.remove('active');
+      }
+    };
+  }
+
+  if (sidebarOverlay) {
+    sidebarOverlay.onclick = () => {
+      sidebar.classList.remove('active');
+      sidebarOverlay.classList.remove('active');
+    };
+  }
+}
 
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -271,7 +301,7 @@ logoutBtn.addEventListener('click', () => {
 function switchModule(moduleId) {
   modules.forEach(mod => mod.id === `mod-${moduleId}` ? mod.classList.add('active') : mod.classList.remove('active'));
   sidebarLinks.forEach(link => link.dataset.mod === moduleId ? link.classList.add('active') : link.classList.remove('active'));
-  
+
   if (moduleId === 'config') {
     initConfigNavigation();
     initConfigModule();
@@ -298,6 +328,7 @@ function initConfigNavigation() {
       const subId = btn.getAttribute('data-sub');
       
       configNavBtns.forEach(b => b.classList.remove('active'));
+
       subModules.forEach(m => {
         m.classList.remove('active');
         m.style.setProperty('display', 'none', 'important');
@@ -312,30 +343,6 @@ function initConfigNavigation() {
         if (typeof lucide !== 'undefined') lucide.createIcons();
       }
     };
-  });
-}
-
-sidebarLinks.forEach(link => {
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    switchModule(link.dataset.mod);
-  });
-});
-
-if (sidebarToggle) {
-  sidebarToggle.addEventListener('click', () => {
-    const isActive = sidebar.classList.toggle('active');
-    if (sidebarOverlay) {
-      if (isActive) sidebarOverlay.classList.add('active');
-      else sidebarOverlay.classList.remove('active');
-    }
-  });
-}
-
-if (sidebarOverlay) {
-  sidebarOverlay.addEventListener('click', () => {
-    sidebar.classList.remove('active');
-    sidebarOverlay.classList.remove('active');
   });
 }
 
