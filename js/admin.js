@@ -80,6 +80,38 @@ const bannerPreviewTitle = document.getElementById('banner-preview-title');
 const bannerPreviewDesc = document.getElementById('banner-preview-desc');
 const bannerPreviewBtn = document.getElementById('banner-preview-btn');
 
+// DOM Elements - Instagram Feed
+const instagramForm = document.getElementById('instagram-config-form');
+const configInstaHandle = document.getElementById('config-insta-handle');
+const instaFiles = [
+  document.getElementById('insta-file-1'),
+  document.getElementById('insta-file-2'),
+  document.getElementById('insta-file-3'),
+  document.getElementById('insta-file-4'),
+  document.getElementById('insta-file-5')
+];
+const instaPrevImages = [
+  document.getElementById('insta-prev-1'),
+  document.getElementById('insta-prev-2'),
+  document.getElementById('insta-prev-3'),
+  document.getElementById('insta-prev-4'),
+  document.getElementById('insta-prev-5')
+];
+const instaIcons = [
+  document.getElementById('insta-icon-1'),
+  document.getElementById('insta-icon-2'),
+  document.getElementById('insta-icon-3'),
+  document.getElementById('insta-icon-4'),
+  document.getElementById('insta-icon-5')
+];
+const configInstaImgInputs = [
+  document.getElementById('config-insta-img-1'),
+  document.getElementById('config-insta-img-2'),
+  document.getElementById('config-insta-img-3'),
+  document.getElementById('config-insta-img-4'),
+  document.getElementById('config-insta-img-5')
+];
+
 // DOM Elements - Form & List (Products)
 const productForm = document.getElementById('product-form');
 const inventoryList = document.getElementById('inventory-list');
@@ -111,16 +143,14 @@ async function loadCategories() {
     const q = query(collection(db, "categories"), orderBy("name", "asc"));
     const querySnapshot = await getDocs(q);
     
-    // Si no hay categorías, crear las básicas
     if (querySnapshot.empty) {
       const defaults = ["Vestidos", "Abrigos", "Accesorios"];
       for (const cat of defaults) {
         await addDoc(collection(db, "categories"), { name: cat });
       }
-      return loadCategories(); // Recargar una vez creadas
+      return loadCategories();
     }
 
-    // Actualizar Selector de Producto
     pCategorySelect.innerHTML = '';
     catListAdmin.innerHTML = '';
 
@@ -128,13 +158,11 @@ async function loadCategories() {
       const cat = docSnap.data();
       const catId = docSnap.id;
       
-      // Añadir al selector
       const option = document.createElement('option');
       option.value = cat.name.toLowerCase();
       option.textContent = cat.name;
       pCategorySelect.appendChild(option);
 
-      // Añadir al gestor (Chips)
       const chip = document.createElement('div');
       chip.className = "cat-chip";
       chip.innerHTML = `
@@ -144,7 +172,6 @@ async function loadCategories() {
       catListAdmin.appendChild(chip);
     });
 
-    // Listener para eliminar categorías
     document.querySelectorAll('.del-cat').forEach(btn => {
       btn.onclick = async () => {
         if (confirm("¿Eliminar esta categoría de la lista?")) {
@@ -167,7 +194,6 @@ async function loadCategories() {
   }
 }
 
-// UI Handlers for Categories
 if (manageCatsBtn) {
   manageCatsBtn.onclick = () => catManagerPanel.style.display = 'block';
 }
@@ -186,7 +212,6 @@ if (saveCatBtn) {
       newCatInput.value = '';
       showToast("¡Categoría añadida!");
       
-      // Automatic Notification
       sendGlobalNotification(
         "Nueva Colección",
         `¡Pau Boutique ha añadido la colección "${name}"! Ven a ver lo nuevo.`,
@@ -202,7 +227,6 @@ if (saveCatBtn) {
   };
 }
 
-// DOM Elements - Dashboard
 const statTotalProducts = document.getElementById('stat-total-products');
 const statCategories = document.getElementById('stat-categories');
 const quickLinks = document.querySelectorAll('.quick-link');
@@ -256,14 +280,12 @@ function switchModule(moduleId) {
     initNotificationsModule();
   }
 
-  // Close sidebar on mobile after selection
   if (window.innerWidth <= 992) {
     sidebar.classList.remove('active');
     if (sidebarOverlay) sidebarOverlay.classList.remove('active');
   }
 }
 
-// Sub-navigation for Config
 function initConfigNavigation() {
   const configNavBtns = document.querySelectorAll('.config-nav-btn');
   const subModules = document.querySelectorAll('.sub-module');
@@ -275,27 +297,18 @@ function initConfigNavigation() {
       e.preventDefault();
       const subId = btn.getAttribute('data-sub');
       
-      console.log("Activando sub-módulo:", subId);
-
-      // 1. Limpiar todos los botones
       configNavBtns.forEach(b => b.classList.remove('active'));
-      
-      // 2. Ocultar todos los sub-módulos con fuerza
       subModules.forEach(m => {
         m.classList.remove('active');
         m.style.setProperty('display', 'none', 'important');
       });
 
-      // 3. Activar el botón actual
       btn.classList.add('active');
 
-      // 4. Mostrar el sub-módulo destino
       const targetMod = document.getElementById(`sub-mod-${subId}`);
       if (targetMod) {
         targetMod.classList.add('active');
         targetMod.style.setProperty('display', 'block', 'important');
-        
-        // Inicializar Lucide para los nuevos iconos si es necesario
         if (typeof lucide !== 'undefined') lucide.createIcons();
       }
     };
@@ -339,14 +352,12 @@ async function initConfigModule() {
     if (configAnnouncementPreview) configAnnouncementPreview.textContent = config.announcement || '';
     if (configAnnouncementActive) configAnnouncementActive.checked = config.announcementActive !== false;
 
-    // Hero Principal Load
     if (configHeroImage) configHeroImage.value = config.heroImage || '';
     if (configHeroSubtitle) configHeroSubtitle.value = config.heroSubtitle || '';
     if (configHeroTitle) configHeroTitle.value = config.heroTitle || '';
     if (configHeroBtnText) configHeroBtnText.value = config.heroBtnText || '';
     updateHeroPreview();
 
-    // Banner Principal Load
     if (configBannerImage) configBannerImage.value = config.bannerImage || '';
     if (configBannerImageActive) configBannerImageActive.checked = config.bannerImageActive !== false;
     if (configBannerSubtitle) configBannerSubtitle.value = config.bannerSubtitle || '';
@@ -354,9 +365,91 @@ async function initConfigModule() {
     if (configBannerDesc) configBannerDesc.value = config.bannerDesc || '';
     if (configBannerBtnText) configBannerBtnText.value = config.bannerBtnText || '';
     updateBannerPreview();
+
+    // Instagram Feed Load
+    if (configInstaHandle) configInstaHandle.value = config.instaHandle || '@pauboutique.p';
+    for (let i = 0; i < 5; i++) {
+      const url = config[`instaImage${i+1}`];
+      if (url && configInstaImgInputs[i]) {
+        configInstaImgInputs[i].value = url;
+        if (instaPrevImages[i]) {
+          instaPrevImages[i].src = url;
+          instaPrevImages[i].style.display = 'block';
+        }
+        if (instaIcons[i]) instaIcons[i].style.display = 'none';
+      }
+    }
   }
   loadCollectionsAdmin();
   loadTestimonialsAdmin();
+}
+
+// Instagram File Uploads
+instaFiles.forEach((fileInput, index) => {
+  if (fileInput) {
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      showToast(`Subiendo Imagen ${index + 1}...`);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+
+      try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error("Fallo en la subida");
+
+        const result = await response.json();
+        if (result.secure_url) {
+          const url = result.secure_url;
+          configInstaImgInputs[index].value = url;
+          instaPrevImages[index].src = url;
+          instaPrevImages[index].style.display = 'block';
+          instaIcons[index].style.display = 'none';
+          showToast(`¡Imagen ${index + 1} cargada!`);
+        }
+      } catch (error) {
+        console.error(`Error Insta Upload ${index+1}:`, error);
+        showToast("Error al subir imagen", "error");
+      }
+    });
+  }
+});
+
+if (instagramForm) {
+  instagramForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    toggleLoading(true);
+
+    try {
+      const updateData = {
+        instaHandle: configInstaHandle.value.trim(),
+        updatedAt: new Date()
+      };
+
+      for (let i = 0; i < 5; i++) {
+        updateData[`instaImage${i+1}`] = configInstaImgInputs[i].value;
+      }
+
+      const success = await updateConfig(updateData);
+
+      if (success) {
+        showToast("¡Feed de Instagram actualizado!");
+      } else {
+        throw new Error("Error al guardar");
+      }
+    } catch (error) {
+      showToast("Error: " + error.message, "error");
+    } finally {
+      toggleLoading(false);
+    }
+  });
 }
 
 function updateHeroPreview() {
@@ -371,12 +464,10 @@ function updateHeroPreview() {
   if (heroPreviewBtn) heroPreviewBtn.textContent = (configHeroBtnText ? configHeroBtnText.value : '') || 'BOTÓN';
 }
 
-// Hero Preview Real-time updates
 [configHeroImage, configHeroSubtitle, configHeroTitle, configHeroBtnText].forEach(el => {
   if (el) el.addEventListener('input', updateHeroPreview);
 });
 
-// Cloudinary Hero Upload (Directo)
 if (heroImageInput) {
   heroImageInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
@@ -487,8 +578,6 @@ if (configForm) {
   });
 }
 
-/* --- Testimonials Logic --- */
-
 async function loadTestimonialsAdmin() {
   if (!testimonialsListAdmin) return;
   testimonialsListAdmin.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">Cargando testimonios de la boutique...</p>';
@@ -540,7 +629,6 @@ async function loadTestimonialsAdmin() {
     
     lucide.createIcons();
 
-    // Listeners para eliminar
     document.querySelectorAll('.btn-delete-t').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -634,8 +722,6 @@ if (refreshTBtn) {
   });
 }
 
-/* --- Collections (Landing Page) Logic --- */
-
 async function loadCollectionsAdmin() {
   if (!collectionsAdminList) return;
   collectionsAdminList.innerHTML = '<p style="text-align: center; color: #999; grid-column: 1/-1;">Buscando colecciones...</p>';
@@ -673,7 +759,6 @@ async function loadCollectionsAdmin() {
     
     lucide.createIcons();
 
-    // Listener para borrar
     document.querySelectorAll('.btn-delete-col').forEach(btn => {
       btn.onclick = async () => {
         if (confirm("¿Eliminar esta colección de la página principal?")) {
@@ -696,7 +781,6 @@ async function loadCollectionsAdmin() {
   }
 }
 
-// Subida de imagen de colección
 if (colFileInput) {
   colFileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
@@ -758,8 +842,6 @@ if (newColForm) {
   });
 }
 
-/* --- Banner (Landing Page) Logic --- */
-
 function updateBannerPreview() {
   if (!bannerAdminPreview) return;
   const isActive = configBannerImageActive ? configBannerImageActive.checked : true;
@@ -768,7 +850,7 @@ function updateBannerPreview() {
     bannerAdminPreview.style.backgroundImage = `url(${configBannerImage.value})`;
   } else {
     bannerAdminPreview.style.backgroundImage = 'none';
-    bannerAdminPreview.style.backgroundColor = '#1a1a1a'; // Fondo oscuro si no hay imagen
+    bannerAdminPreview.style.backgroundColor = '#1a1a1a';
   }
   if (bannerPreviewSubtitle) bannerPreviewSubtitle.textContent = (configBannerSubtitle ? configBannerSubtitle.value : '') || 'SUBTÍTULO';
   if (bannerPreviewTitle) bannerPreviewTitle.textContent = (configBannerTitle ? configBannerTitle.value : '') || 'TÍTULO PRINCIPAL';
@@ -776,13 +858,11 @@ function updateBannerPreview() {
   if (bannerPreviewBtn) bannerPreviewBtn.textContent = (configBannerBtnText ? configBannerBtnText.value : '') || 'BOTÓN';
 }
 
-// Banner Preview Real-time updates
 [configBannerImage, configBannerImageActive, configBannerSubtitle, configBannerTitle, configBannerDesc, configBannerBtnText].forEach(el => {
   if (el) el.addEventListener('input', updateBannerPreview);
   if (el && el.type === 'checkbox') el.addEventListener('change', updateBannerPreview);
 });
 
-// Cloudinary Banner Upload
 if (bannerImageInput) {
   bannerImageInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
@@ -846,14 +926,11 @@ if (bannerForm) {
   });
 }
 
-/* --- Dashboard Init --- */
-
 async function initDashboard() {
   await loadInventory();
   await loadCategories();
 }
 
-/* --- Drag & Drop para el Dropzone --- */
 if (dropzone) {
   ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropzone.addEventListener(eventName, (e) => {
@@ -876,8 +953,6 @@ if (dropzone) {
     handleFiles(files);
   }, false);
 }
-
-/* --- Cloudinary (Subida Nativa) --- */
 
 if (imagesInput) {
   imagesInput.addEventListener('change', (e) => {
@@ -955,8 +1030,6 @@ function renderPreviews() {
     imagePreview.appendChild(item);
   });
 }
-
-/* --- Firestore CRUD (Products) --- */
 
 productForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -1078,7 +1151,6 @@ if (migrateBtn) {
     }
   });
 }
-/* --- Notifications Logic --- */
 
 async function initNotificationsModule() {
   loadSubscribersCount();
@@ -1144,8 +1216,6 @@ async function sendGlobalNotification(title, body, image = "") {
       status: 'sent' 
     };
     await addDoc(collection(db, "notifications_history"), notifData);
-    
-    console.log(`Push Notification Saved: ${title}`);
     loadNotificationsHistory();
     return { success: true };
   } catch (error) {

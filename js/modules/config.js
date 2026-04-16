@@ -91,6 +91,28 @@ export async function applyConfig() {
     if (bContainer) bContainer.style.opacity = "1";
     if (bImg && config.bannerImageActive === false) bImg.style.opacity = "0";
     else if (bImg && config.bannerImage) bImg.style.opacity = "1";
+
+    // Instagram Dynamic Content
+    const instaTitle = document.querySelector('.instagram .section-header__title');
+    if (instaTitle && config.instaHandle) {
+      instaTitle.textContent = config.instaHandle;
+    }
+
+    const instaLinks = document.querySelectorAll('.instagram__item');
+    const instaHandleUrl = config.instaHandle ? `https://www.instagram.com/${config.instaHandle.replace('@', '')}` : '#';
+    
+    for (let i = 0; i < 5; i++) {
+      const url = config[`instaImage${i+1}`];
+      const imgEl = document.getElementById(`insta-img-${i+1}`);
+      const linkEl = instaLinks[i];
+
+      if (url && imgEl) {
+        imgEl.src = url;
+      }
+      if (linkEl) {
+        linkEl.href = instaHandleUrl;
+      }
+    }
   } else {
     // Si falla la carga, mostrar los elementos de todos modos
     if (heroContainer) heroContainer.style.opacity = "1";
