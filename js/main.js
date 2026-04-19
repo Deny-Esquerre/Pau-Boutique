@@ -5,7 +5,7 @@
 import { db } from './firebase-config.js';
 import { doc, getDoc, collection, getDocs, orderBy, query, onSnapshot, where, limit } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 import { loadStaticImages } from './modules/utils.js';
-import { closeModal } from './modules/products.js';
+import { closeModal, openProductModal } from './modules/products.js';
 import { closeCart, openCart, addToCart } from './modules/cart.js';
 import { 
   initHeaderScroll, initMobileMenu, initTestimonials, 
@@ -114,22 +114,38 @@ const renderProductsFresh = () => {
   
   onSnapshot(q, (snap) => {
     const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    grid.innerHTML = products.map(p => `
-      <div class="product-card" data-id="${p.id}">
-        <div class="product-card__image-wrap">
-          <img src="${optimizeUrl(p.images?.[0] || p.image, 'w_600,q_auto,f_auto')}" alt="${p.name}" class="product-card__image" loading="lazy">
-          ${p.badge ? `<span class="product-card__badge">${p.badge}</span>` : ''}
-          <div class="product-card__actions">
-            <button class="product-card__add-btn" data-id="${p.id}">Añadir al Carrito</button>
+
+    grid.innerHTML = products.map(p => {
+      const priceHTML = p.salePrice
+        ? `<span class="product-card__price--original">S/. ${p.price}</span>
+           <span class="product-card__price--sale">S/. ${p.salePrice}</span>`
+        : `S/. ${p.price}`;
+      return `
+        <div class="product-card" data-id="${p.id}" style="cursor:pointer">
+          <div class="product-card__image-wrap">
+            <img src="${optimizeUrl(p.images?.[0] || p.image, 'w_600,q_auto,f_auto')}" alt="${p.name}" class="product-card__image" loading="lazy">
+            ${p.badge ? `<span class="product-card__badge">${p.badge}</span>` : ''}
+            <div class="product-card__actions">
+              <button class="product-card__add-btn" data-id="${p.id}">Añadir al Carrito</button>
+            </div>
+          </div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">${p.name}</h3>
+            <p class="product-card__price">${priceHTML}</p>
           </div>
         </div>
-        <div class="product-card__info">
-          <h3 class="product-card__name">${p.name}</h3>
-          <p class="product-card__price">S/. ${p.price}</p>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
+    // Click en tarjeta → abrir modal con datos completos
+    grid.querySelectorAll('.product-card').forEach(card => {
+      card.onclick = () => {
+        const product = products.find(item => item.id === card.dataset.id);
+        if (product) openProductModal(product);
+      };
+    });
+
+    // Botón añadir al carrito (sin propagar al click de la tarjeta)
     grid.querySelectorAll('.product-card__add-btn').forEach(btn => {
       btn.onclick = (e) => {
         e.stopPropagation();

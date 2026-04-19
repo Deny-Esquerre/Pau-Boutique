@@ -13,7 +13,8 @@ import { getUnsplashUrl } from './utils.js';
 import { addToCart } from './cart.js';
 
 // Cache for products to avoid redundant fetches
-let productsCache = [];
+let productsCache = {}; 
+let currentViewProducts = [];
 let unsubscribeProducts = null;
 
 /**
@@ -74,12 +75,14 @@ export function renderProducts(filter = 'all') {
     if (unsubscribeProducts) unsubscribeProducts();
 
     unsubscribeProducts = onSnapshot(q, (querySnapshot) => {
-      productsCache = [];
+      currentViewProducts = [];
       querySnapshot.forEach((doc) => {
-        productsCache.push({ id: doc.id, ...doc.data() });
+        const product = { id: doc.id, ...doc.data() };
+        productsCache[doc.id] = product; 
+        currentViewProducts.push(product);
       });
 
-      if (productsCache.length === 0) {
+      if (currentViewProducts.length === 0) {
         grid.innerHTML = `
           <div style="grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--color-gray);">
             <p style="font-family: var(--font-serif); font-style: italic; font-size: 1.2rem; margin-bottom: 10px;">Lo sentimos</p>
@@ -89,7 +92,7 @@ export function renderProducts(filter = 'all') {
         return;
       }
 
-      grid.innerHTML = productsCache.map(product => {
+      grid.innerHTML = currentViewProducts.map(product => {
         const priceHTML = product.salePrice
           ? `<span class="product-card__price--original">S/. ${product.price}</span>
              <span class="product-card__price--sale">S/. ${product.salePrice}</span>`
@@ -142,7 +145,7 @@ function attachEventListeners(grid) {
   grid.querySelectorAll('.product-card__add-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const product = productsCache.find(p => p.id === btn.dataset.id);
+      const product = productsCache[btn.dataset.id];
       if (product) {
         addToCart(product);
       }
@@ -150,9 +153,21 @@ function attachEventListeners(grid) {
   });
 }
 
-export function openProductModal(id) {
-  const product = productsCache.find(p => p.id === id);
-  if (!product) return;
+export function openProductModal(idOrProduct) {
+  // Acepta tanto un objeto producto completo como un string ID
+  let product;
+  if (typeof idOrProduct === 'object' && idOrProduct !== null) {
+    product = idOrProduct;
+    // Guardar en cache por si se llama con ID después
+    if (product.id) productsCache[product.id] = product;
+  } else {
+    product = productsCache[idOrProduct];
+  }
+
+  if (!product) {
+    console.error("Producto no encontrado.");
+    return;
+  }
 
   const modal = document.getElementById('product-modal');
   const content = document.getElementById('modal-content');
@@ -163,31 +178,64 @@ export function openProductModal(id) {
        <span class="product-card__price--sale">S/. ${product.salePrice}</span>`
     : `S/. ${product.price}`;
 
-  const rawImg = (product.images && product.images.length > 0) ? product.images[0] : product.image;
-  const imgSrc = rawImg.startsWith('http') ? rawImg : getUnsplashUrl(rawImg, 800, 1000);
+  const fallbackImg = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80';
+  const images = (product.images && product.images.length > 0) 
+    ? product.images 
+    : [product.image || fallbackImg];
+  
+  const mainImgSrc = images[0].startsWith('http') ? images[0] : getUnsplashUrl(images[0], 800, 1000);
 
-  content.innerHTML = `
-    <div class="modal__container">
-      <div class="modal__media">
-        <img src="${imgSrc}" alt="${product.name}">
-      </div>
-      <div class="modal__info">
-        <span class="modal__category">${product.category}</span>
-        <h2 class="modal__title">${product.name}</h2>
-        <div class="modal__price">${priceHTML}</div>
-        <p class="modal__desc">${product.description || 'Elegancia y estilo exclusivo.'}</p>
-        <button class="btn btn--primary add-to-cart-modal" data-id="${product.id}">Agregar al Carrito</button>
-      </div>
+  // Thumbnails siempre visibles (fuera del overflow:hidden), se muestran aunque sea 1 imagen
+  const thumbnailsHTML = images.length > 0 ? `
+    <div class="modal__thumbnails">
+      ${images.map((img, index) => {
+        const thumbSrc = img.startsWith('http') ? img : getUnsplashUrl(img, 200, 200);
+        const fullSrc = img.startsWith('http') ? img : getUnsplashUrl(img, 800, 1000);
+        return `<img src="${thumbSrc}" alt="${product.name} ${index + 1}" class="modal__thumb ${index === 0 ? 'active' : ''}" data-full="${fullSrc}">`;
+      }).join('')}
     </div>
-  `;
+  ` : '';
 
-  content.querySelector('.add-to-cart-modal').onclick = () => {
-    addToCart(product);
-    closeModal();
-  };
+  if (content) {
+    content.innerHTML = `
+      <div class="modal__container">
+        <div class="modal__media">
+          <img id="modal-main-image" src="${mainImgSrc}" alt="${product.name}">
+        </div>
+        ${thumbnailsHTML}
+        <div class="modal__info">
+          <span class="modal__category">${product.category}</span>
+          <h2 class="modal__title">${product.name}</h2>
+          <div class="modal__price">${priceHTML}</div>
+          <p class="modal__desc">${product.description || 'Elegancia y estilo exclusivo.'}</p>
+          <button class="btn btn--primary add-to-cart-modal" data-id="${product.id}">Agregar al Carrito</button>
+        </div>
+      </div>
+    `;
 
-  modal.classList.add('active');
-  overlay.classList.add('active');
+    // Thumbs logic
+    const thumbs = content.querySelectorAll('.modal__thumb');
+    const mainImg = content.querySelector('#modal-main-image');
+    
+    thumbs.forEach(thumb => {
+      thumb.onclick = () => {
+        mainImg.src = thumb.dataset.full;
+        thumbs.forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+      };
+    });
+
+    const addToCartBtn = content.querySelector('.add-to-cart-modal');
+    if (addToCartBtn) {
+      addToCartBtn.onclick = () => {
+        addToCart(product);
+        closeModal();
+      };
+    }
+  }
+
+  if (modal) modal.classList.add('active');
+  if (overlay) overlay.classList.add('active');
   document.body.classList.add('no-scroll');
 }
 
