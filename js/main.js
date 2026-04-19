@@ -63,10 +63,13 @@ const fetchCollectionsCached = async () => {
 const applyConfigOptimized = (config) => {
   if (!config) return;
   const heroImg = document.getElementById('hero-img');
-  const bImg = document.getElementById('banner-img');
+  const bannerSection = document.querySelector('.featured-banner');
   
   if (config.heroImage && heroImg) heroImg.src = optimizeUrl(config.heroImage, 'w_1400,q_auto,f_auto');
-  if (config.bannerImage && bImg) bImg.src = optimizeUrl(config.bannerImage, 'w_1400,q_auto,f_auto');
+  
+  // Banner visibility logic
+  const isBannerActive = config.bannerActive !== false;
+  if (bannerSection) bannerSection.style.display = isBannerActive ? 'flex' : 'none';
   
   document.getElementById('announcement-bar').style.display = config.announcementActive ? 'block' : 'none';
   // Repetir el texto para efecto infinito fluido
@@ -78,7 +81,7 @@ const applyConfigOptimized = (config) => {
   document.getElementById('hero-container').style.opacity = "1";
   
   const bTitle = document.getElementById('banner-title');
-  if (bTitle) {
+  if (bTitle && isBannerActive) {
     bTitle.textContent = config.bannerTitle;
     document.getElementById('banner-subtitle').textContent = config.bannerSubtitle;
     document.getElementById('banner-desc').textContent = config.bannerDesc;

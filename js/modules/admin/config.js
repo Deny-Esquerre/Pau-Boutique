@@ -32,10 +32,8 @@ export function initConfig() {
 
   // Banner
   const bannerForm = document.getElementById('banner-config-form');
-  const bannerImageInput = document.getElementById('banner-image-input');
   if (bannerForm) bannerForm.onsubmit = handleBannerSubmit;
-  if (bannerImageInput) bannerImageInput.onchange = handleBannerImageUpload;
-  ['config-banner-image', 'config-banner-image-active', 'config-banner-subtitle', 'config-banner-title', 'config-banner-desc', 'config-banner-btn-text'].forEach(id => {
+  ['config-banner-active', 'config-banner-subtitle', 'config-banner-title', 'config-banner-desc', 'config-banner-btn-text'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.oninput = updateBannerPreview;
@@ -72,8 +70,7 @@ async function loadConfigData() {
     'config-hero-subtitle': config.heroSubtitle,
     'config-hero-title': config.heroTitle,
     'config-hero-btn-text': config.heroBtnText,
-    'config-banner-image': config.bannerImage,
-    'config-banner-image-active': config.bannerImageActive !== false,
+    'config-banner-active': config.bannerActive !== false,
     'config-banner-subtitle': config.bannerSubtitle,
     'config-banner-title': config.bannerTitle,
     'config-banner-desc': config.bannerDesc,
@@ -161,9 +158,6 @@ function updateHeroPreview() {
 function updateBannerPreview() {
   const preview = document.getElementById('banner-admin-preview');
   if (!preview) return;
-  const active = document.getElementById('config-banner-image-active')?.checked;
-  const img = document.getElementById('config-banner-image')?.value;
-  preview.style.backgroundImage = (active && img) ? `url(${img})` : 'none';
   const subtitle = document.getElementById('banner-preview-subtitle');
   if (subtitle) subtitle.textContent = document.getElementById('config-banner-subtitle')?.value || '';
   const title = document.getElementById('banner-preview-title');
@@ -177,31 +171,14 @@ function updateBannerPreview() {
 async function handleBannerSubmit(e) {
   e.preventDefault();
   const success = await updateConfig({
-    bannerImage: document.getElementById('config-banner-image').value.trim(),
-    bannerImageActive: document.getElementById('config-banner-image-active').checked,
+    bannerActive: document.getElementById('config-banner-active').checked,
     bannerSubtitle: document.getElementById('config-banner-subtitle').value.trim(),
     bannerTitle: document.getElementById('config-banner-title').value.trim(),
     bannerDesc: document.getElementById('config-banner-desc').value.trim(),
     bannerBtnText: document.getElementById('config-banner-btn-text').value.trim(),
     updatedAt: new Date()
   });
-  if (success) showToast("¡Banner Principal actualizado!");
-}
-
-async function handleBannerImageUpload(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const formData = new FormData();
-  formData.append('file', file); formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
-  try {
-    const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`, { method: 'POST', body: formData });
-    const result = await response.json();
-    if (result.secure_url) {
-      document.getElementById('config-banner-image').value = result.secure_url;
-      updateBannerPreview();
-      showToast("Imagen del banner cargada");
-    }
-  } catch (error) { showToast("Error al subir", "error"); }
+  if (success) showToast("¡Banner de texto actualizado!");
 }
 
 async function handleInstagramSubmit(e) {

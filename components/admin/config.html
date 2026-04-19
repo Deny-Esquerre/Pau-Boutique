@@ -195,7 +195,7 @@
         Banner de Temporada</h3>
 
       <div id="banner-admin-preview"
-        style="background: #eee; min-height: 250px; border-radius: 8px; margin-bottom: 2rem; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 3rem; background-size: cover; background-position: center; color: white;">
+        style="background: var(--color-black); min-height: 250px; border-radius: 8px; margin-bottom: 2rem; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 3rem; color: white;">
         <div style="z-index: 2; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
           <p id="banner-preview-subtitle"
             style="text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.7rem; margin-bottom: 10px;"></p>
@@ -206,7 +206,6 @@
           <button id="banner-preview-btn" class="btn btn--outline-light"
             style="margin-top: 25px; pointer-events: none; border-color: white; color: white;"></button>
         </div>
-        <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.35); z-index: 1;"></div>
       </div>
 
       <form id="banner-config-form"
@@ -215,33 +214,14 @@
           style="grid-column: span 2; display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--color-warm-white); border: 1px solid #eee; margin-bottom: 10px;">
           <div>
             <label
-              style="font-size: 0.8rem; font-weight: 600; color: var(--color-black); display: block; margin-bottom: 4px;">Mostrar
-              Imagen de Fondo</label>
-            <span style="font-size: 0.7rem; color: var(--color-gray);">¿Activar imagen de temporada en el
-              banner?</span>
+              style="font-size: 0.8rem; font-weight: 600; color: var(--color-black); display: block; margin-bottom: 4px;">Estado del Banner</label>
+            <span style="font-size: 0.7rem; color: var(--color-gray);">¿Activar este bloque de texto en la web?</span>
           </div>
           <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
-            <input type="checkbox" id="config-banner-image-active" style="opacity: 0; width: 0; height: 0;">
+            <input type="checkbox" id="config-banner-active" style="opacity: 0; width: 0; height: 0;">
             <span class="slider"
               style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
           </label>
-        </div>
-
-        <div class="form-group" style="grid-column: span 2;">
-          <label
-            style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-gray); letter-spacing: 0.05em;">Imagen
-            de Fondo</label>
-          <div class="native-upload-container">
-            <input type="file" id="banner-image-input" accept="image/*" style="display: none;">
-            <label for="banner-image-input" class="upload-dropzone" id="banner-dropzone"
-              style="padding: 25px; border-style: solid; background: #fafafa;">
-              <i data-lucide="image" style="width: 24px; height: 24px;"></i>
-              <p style="font-size: 0.7rem;">Cambiar imagen del banner</p>
-              <span id="banner-upload-status" style="font-size: 0.6rem; color: var(--admin-accent);"></span>
-            </label>
-            <input type="url" id="config-banner-image" class="form-control" readonly
-              style="width: 100%; border: 1px solid #eee; padding: 10px; font-size: 0.65rem; margin-top: 10px; background: #f9f9f9; color: #999;">
-          </div>
         </div>
 
         <div class="form-group">
