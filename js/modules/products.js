@@ -153,6 +153,12 @@ function attachEventListeners(grid) {
   });
 }
 
+// --- CLOUDINARY OPTIMIZER ---
+const optimizeUrl = (url, params = 'w_800,q_auto,f_auto') => {
+  if (!url || typeof url !== 'string' || !url.includes('cloudinary.com')) return url;
+  return url.replace('upload/', `upload/${params}/`);
+};
+
 export function openProductModal(idOrProduct) {
   // Acepta tanto un objeto producto completo como un string ID
   let product;
@@ -183,14 +189,13 @@ export function openProductModal(idOrProduct) {
     ? product.images 
     : [product.image || fallbackImg];
   
-  const mainImgSrc = images[0].startsWith('http') ? images[0] : getUnsplashUrl(images[0], 800, 1000);
+  const mainImgSrc = optimizeUrl(images[0]);
 
-  // Thumbnails siempre visibles (fuera del overflow:hidden), se muestran aunque sea 1 imagen
-  const thumbnailsHTML = images.length > 0 ? `
+  const thumbnailsHTML = images.length > 1 ? `
     <div class="modal__thumbnails">
       ${images.map((img, index) => {
-        const thumbSrc = img.startsWith('http') ? img : getUnsplashUrl(img, 200, 200);
-        const fullSrc = img.startsWith('http') ? img : getUnsplashUrl(img, 800, 1000);
+        const thumbSrc = optimizeUrl(img, 'w_200,h_200,c_fill,q_auto,f_auto');
+        const fullSrc = optimizeUrl(img);
         return `<img src="${thumbSrc}" alt="${product.name} ${index + 1}" class="modal__thumb ${index === 0 ? 'active' : ''}" data-full="${fullSrc}">`;
       }).join('')}
     </div>
@@ -201,8 +206,8 @@ export function openProductModal(idOrProduct) {
       <div class="modal__container">
         <div class="modal__media">
           <img id="modal-main-image" src="${mainImgSrc}" alt="${product.name}">
+          ${thumbnailsHTML}
         </div>
-        ${thumbnailsHTML}
         <div class="modal__info">
           <span class="modal__category">${product.category}</span>
           <h2 class="modal__title">${product.name}</h2>

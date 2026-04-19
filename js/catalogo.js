@@ -5,7 +5,7 @@
 import { db } from './firebase-config.js';
 import {
   collection, getDocs, onSnapshot,
-  query, orderBy
+  query, orderBy, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 import { openProductModal, closeModal } from './modules/products.js';
 import { addToCart, openCart, closeCart } from './modules/cart.js';
@@ -45,9 +45,51 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupSaleToggle();
   setupClearFilters();
 
+  // Listen for real-time announcement updates
+  onSnapshot(doc(db, 'settings', 'general'), (snap) => {
+    if (snap.exists()) {
+      const config = snap.data();
+      const bar = document.getElementById('announcement-bar');
+      const textEl = document.getElementById('announcement-text');
+      if (bar && textEl) {
+        bar.style.display = config.announcementActive ? 'block' : 'none';
+        const text = (config.announcement || "") + " &nbsp; &nbsp; • &nbsp; &nbsp; ";
+        textEl.innerHTML = text.repeat(10);
+      }
+    }
+  });
+
   await loadCategories();
+
+  // Leer parámetro de URL si venimos de un link específico
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlCat = urlParams.get('categoria');
+  if (urlCat) {
+    // selectCategory actualiza el estado y la UI de los filtros
+    selectCategory(urlCat.toLowerCase());
+  }
+
   subscribeProducts();
 });
+
+// --- ANNOUNCEMENT ---
+async function loadAnnouncement() {
+  const bar = document.getElementById('announcement-bar');
+  const textEl = document.getElementById('announcement-text');
+  if (!bar || !textEl) return;
+
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'general'));
+    if (snap.exists()) {
+      const config = snap.data();
+      bar.style.display = config.announcementActive ? 'block' : 'none';
+      const text = (config.announcement || "") + " &nbsp; &nbsp; • &nbsp; &nbsp; ";
+      textEl.innerHTML = text.repeat(10);
+    }
+  } catch (e) {
+    console.error("Error al cargar anuncio:", e);
+  }
+}
 
 // --- FIREBASE ---
 async function loadCategories() {
@@ -55,6 +97,7 @@ async function loadCategories() {
     const q = query(collection(db, 'categories'), orderBy('name', 'asc'));
     const snap = await getDocs(q);
     const list = document.getElementById('category-filter-list');
+    if (!list) return;
 
     snap.forEach(docSnap => {
       const cat = docSnap.data();
@@ -71,7 +114,8 @@ async function loadCategories() {
     });
 
     // Listener para "Todas"
-    document.querySelector('[data-cat="all"]').addEventListener('click', () => selectCategory('all'));
+    const allBtn = document.querySelector('[data-cat="all"]');
+    if (allBtn) allBtn.addEventListener('click', () => selectCategory('all'));
   } catch (e) {
     console.error('Error cargando categorías:', e);
   }

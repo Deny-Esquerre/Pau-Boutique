@@ -2,12 +2,29 @@
 .announcement-bar {
   background-color: var(--color-black);
   color: var(--color-white);
-  text-align: center;
-  padding: 8px var(--space-sm);
+  padding: 8px 0;
   font-size: 0.7rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 400;
+  overflow: hidden;
+  width: 100%;
+}
+
+#announcement-text {
+  display: inline-block;
+  padding-left: 50px;
+  animation: marquee 60s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.announcement-bar:hover #announcement-text {
+  animation-play-state: paused;
 }
 
 /* --- Header --- */

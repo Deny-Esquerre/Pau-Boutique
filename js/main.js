@@ -69,7 +69,9 @@ const applyConfigOptimized = (config) => {
   if (config.bannerImage && bImg) bImg.src = optimizeUrl(config.bannerImage, 'w_1400,q_auto,f_auto');
   
   document.getElementById('announcement-bar').style.display = config.announcementActive ? 'block' : 'none';
-  document.getElementById('announcement-text').textContent = config.announcement;
+  // Repetir el texto para efecto infinito fluido
+  const announcementText = config.announcement + " &nbsp; &nbsp; • &nbsp; &nbsp; ";
+  document.getElementById('announcement-text').innerHTML = announcementText.repeat(10);
   document.getElementById('hero-subtitle').textContent = config.heroSubtitle;
   document.getElementById('hero-title').innerHTML = config.heroTitle;
   document.getElementById('hero-btn').textContent = config.heroBtnText;
@@ -91,7 +93,7 @@ const renderCollectionsOptimized = (cols) => {
   if (!grid || !cols) return;
 
   grid.innerHTML = cols.map(col => `
-    <a href="#productos" class="category-card" data-animate>
+    <a href="catalogo.html?categoria=${encodeURIComponent(col.name.toLowerCase())}" class="category-card" data-animate>
       <div class="category-card__image-wrap">
         <img src="${optimizeUrl(col.image, 'w_600,q_auto,f_auto')}" alt="${col.name}" class="category-card__image" loading="lazy">
       </div>
@@ -103,7 +105,7 @@ const renderCollectionsOptimized = (cols) => {
   `).join('');
 
   if (footer) {
-    footer.innerHTML = cols.slice(0, 3).map(col => `<a href="#productos" class="footer__link">${col.name}</a>`).join('');
+    footer.innerHTML = cols.slice(0, 3).map(col => `<a href="catalogo.html?categoria=${encodeURIComponent(col.name.toLowerCase())}" class="footer__link">${col.name}</a>`).join('');
   }
   initScrollAnimations();
 };
@@ -158,14 +160,21 @@ const renderProductsFresh = () => {
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
-  // Promise.all for parallel loading
-  const [config, collections] = await Promise.all([
-    fetchConfigCached(),
+  // Listen to config changes in real-time
+  onSnapshot(doc(db, 'settings', 'general'), (snap) => {
+    if (snap.exists()) {
+      const config = snap.data();
+      applyConfigOptimized(config);
+      cacheManager.set('config', config);
+    }
+  });
+
+  // Promise.all for other parallel data fetching
+  const [collections] = await Promise.all([
     fetchCollectionsCached(),
     renderProductsFresh()
   ]);
 
-  applyConfigOptimized(config);
   renderCollectionsOptimized(collections);
 
   // Remove Skeletons
