@@ -93,7 +93,18 @@ const applyConfigOptimized = (config) => {
 const renderCollectionsOptimized = (cols) => {
   const grid = document.getElementById('categories-grid');
   const footer = document.getElementById('footer-collections');
-  if (!grid || !cols) return;
+  if (!grid) return;
+
+  if (!cols || cols.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; text-align: center; background: #fafafa; border: 1px dashed #eee; width: 100%;">
+        <p style="font-family: var(--font-serif); font-style: italic; font-size: 1.2rem; color: var(--color-gray); margin-bottom: 10px;">Próximamente nuevas colecciones</p>
+        <p style="font-family: var(--font-sans); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: #999;">Estamos preparando piezas exclusivas para ti.</p>
+      </div>
+    `;
+    if (footer) footer.innerHTML = '<p class="footer__link" style="opacity: 0.6;">Sin colecciones</p>';
+    return;
+  }
 
   grid.innerHTML = cols.map(col => `
     <a href="catalogo.html?categoria=${encodeURIComponent(col.name.toLowerCase())}" class="category-card" data-animate>
